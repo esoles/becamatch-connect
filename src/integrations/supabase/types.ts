@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          area: string
+          birth_date: string
+          countries: string[]
+          created_at: string
+          email: string
+          full_name: string
+          gpa: number
+          graduation_year: number
+          id: string
+          languages: Json
+          parental_status: string
+          study_level: string
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          birth_date: string
+          countries?: string[]
+          created_at?: string
+          email: string
+          full_name: string
+          gpa: number
+          graduation_year: number
+          id: string
+          languages?: Json
+          parental_status?: string
+          study_level: string
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          birth_date?: string
+          countries?: string[]
+          created_at?: string
+          email?: string
+          full_name?: string
+          gpa?: number
+          graduation_year?: number
+          id?: string
+          languages?: Json
+          parental_status?: string
+          study_level?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      scholarships: {
+        Row: {
+          archived: boolean
+          area: string | null
+          country: string
+          coverage: string | null
+          created_at: string
+          deadline: string
+          documents: string | null
+          entity: string
+          es_demo: boolean
+          id: string
+          language_code: string | null
+          language_level: string | null
+          min_gpa: number | null
+          name: string
+          official_url: string | null
+          requirements: string | null
+          study_level: string | null
+          verified: boolean
+        }
+        Insert: {
+          archived?: boolean
+          area?: string | null
+          country: string
+          coverage?: string | null
+          created_at?: string
+          deadline: string
+          documents?: string | null
+          entity: string
+          es_demo?: boolean
+          id?: string
+          language_code?: string | null
+          language_level?: string | null
+          min_gpa?: number | null
+          name: string
+          official_url?: string | null
+          requirements?: string | null
+          study_level?: string | null
+          verified?: boolean
+        }
+        Update: {
+          archived?: boolean
+          area?: string | null
+          country?: string
+          coverage?: string | null
+          created_at?: string
+          deadline?: string
+          documents?: string | null
+          entity?: string
+          es_demo?: boolean
+          id?: string
+          language_code?: string | null
+          language_level?: string | null
+          min_gpa?: number | null
+          name?: string
+          official_url?: string | null
+          requirements?: string | null
+          study_level?: string | null
+          verified?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
