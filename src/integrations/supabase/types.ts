@@ -62,6 +62,41 @@ export type Database = {
         }
         Relationships: []
       }
+      scholarship_decisions: {
+        Row: {
+          created_at: string
+          decision: string
+          id: string
+          scholarship_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          id?: string
+          scholarship_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          id?: string
+          scholarship_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scholarship_decisions_scholarship_id_fkey"
+            columns: ["scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scholarships: {
         Row: {
           archived: boolean
