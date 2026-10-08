@@ -62,7 +62,10 @@ export function languageScore(required: string | null, user: Cefr | undefined): 
 export function scoreComponents(p: CompatProfile, s: CompatScholarship) {
   const c: Partial<Record<Criterion, number>> = {};
   if (s.study_level) c.level = norm(s.study_level) === norm(p.study_level) ? 100 : 0;
-  if (s.area) c.area = norm(s.area) === norm(p.area) ? 100 : 0;
+  if (s.area) {
+    const areas = s.area.split(",").map(norm);
+    c.area = areas.includes("todas") || areas.includes(norm(p.area)) ? 100 : 0;
+  }
   if (s.language_code && s.language_level) {
     const ul = p.languages.find((l) => norm(l.code) === norm(s.language_code!));
     c.language = languageScore(s.language_level, ul?.level);
