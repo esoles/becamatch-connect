@@ -13,7 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/mazo'
+import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedBecaIdRouteImport } from './routes/_authenticated/beca.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,9 +36,19 @@ const AuthenticatedMazoRoute = AuthenticatedMazoRouteImport.update({
   path: '/mazo',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMisBecasRoute = AuthenticatedMisBecasRouteImport.update({
+  id: '/mis-becas',
+  path: '/mis-becas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBecaIdRoute = AuthenticatedBecaIdRouteImport.update({
+  id: '/beca/$id',
+  path: '/beca/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
@@ -44,13 +56,17 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mazo': typeof AuthenticatedMazoRoute
+  '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/beca/$id': typeof AuthenticatedBecaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mazo': typeof AuthenticatedMazoRoute
+  '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/beca/$id': typeof AuthenticatedBecaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -58,20 +74,24 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
+  '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/beca/$id': typeof AuthenticatedBecaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/mazo' | '/perfil'
+  fullPaths: '/' | '/auth' | '/mazo' | '/mis-becas' | '/perfil' | '/beca/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/mazo' | '/perfil'
+  to: '/' | '/auth' | '/mazo' | '/mis-becas' | '/perfil' | '/beca/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/mazo'
+    | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/_authenticated/beca/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -110,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMazoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mis-becas': {
+      id: '/_authenticated/mis-becas'
+      path: '/mis-becas'
+      fullPath: '/mis-becas'
+      preLoaderRoute: typeof AuthenticatedMisBecasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -117,17 +144,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/beca/$id': {
+      id: '/_authenticated/beca/$id'
+      path: '/beca/$id'
+      fullPath: '/beca/$id'
+      preLoaderRoute: typeof AuthenticatedBecaIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMazoRoute: typeof AuthenticatedMazoRoute
+  AuthenticatedMisBecasRoute: typeof AuthenticatedMisBecasRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedBecaIdRoute: typeof AuthenticatedBecaIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMazoRoute: AuthenticatedMazoRoute,
+  AuthenticatedMisBecasRoute: AuthenticatedMisBecasRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedBecaIdRoute: AuthenticatedBecaIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
