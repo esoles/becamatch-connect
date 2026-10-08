@@ -1,0 +1,15 @@
+DELETE FROM public.scholarships WHERE es_demo = true;
+
+INSERT INTO public.scholarships (name, entity, country, study_level, area, language_code, language_level, min_gpa, deadline, coverage, requirements, documents, official_url, verified, archived, es_demo) VALUES
+('Beca Excelencia Andina', 'Fundación Horizonte (ejemplo)', 'Perú', 'pregrado', 'Ingeniería, Ciencias', 'Español', NULL, 15, '2026-11-15', 'Matrícula y pensión completas', NULL, NULL, 'https://ejemplo.org/becas/1', true, false, true),
+('Maestría en Datos para el Desarrollo', 'Universidad del Pacífico Sur (ejemplo)', 'Chile', 'maestría', 'Ingeniería, Economía', 'Español', NULL, 14, '2026-12-01', 'Matrícula y manutención', NULL, NULL, 'https://ejemplo.org/becas/2', true, false, true),
+('Programa Líderes Digitales', 'Instituto Nova (ejemplo)', 'España', 'curso', 'Tecnología, Negocios', 'Español', NULL, 13, '2026-10-30', 'Curso completo en línea', NULL, NULL, 'https://ejemplo.org/becas/3', true, false, true),
+('Beca Ciencia Verde', 'Red Amazonía Investiga (ejemplo)', 'Brasil', 'doctorado', 'Biología, Ambiental', 'Portugués', 'B2', 15, '2027-01-20', 'Manutención y pasajes', NULL, NULL, 'https://ejemplo.org/becas/4', true, false, true),
+('Beca Mujeres en Ingeniería', 'Asociación Ingenia (ejemplo)', 'Perú', 'pregrado', 'Ingeniería', 'Español', NULL, 14, '2026-11-30', 'Pensión y laptop', NULL, NULL, 'https://ejemplo.org/becas/5', true, false, true),
+('Master in AI Systems', 'Northbridge Institute (ejemplo)', 'Canadá', 'maestría', 'Tecnología, Ingeniería', 'Inglés', 'B2', 15, '2027-02-15', 'Matrícula completa', NULL, NULL, 'https://ejemplo.org/becas/6', true, false, true),
+('Beca Emprende Rural', 'Fondo Semilla (ejemplo)', 'Perú', 'curso', 'Negocios, Agronomía', 'Español', NULL, 12, '2026-10-25', 'Curso y capital semilla', NULL, NULL, 'https://ejemplo.org/becas/7', true, false, true),
+('Doctorado en Salud Pública', 'Universidad Atlántica (ejemplo)', 'México', 'doctorado', 'Salud', 'Español', NULL, 16, '2027-03-01', 'Manutención y seguro', NULL, NULL, 'https://ejemplo.org/becas/8', true, false, true),
+('Beca Intercambio Pacífico', 'Consorcio Universitario (ejemplo)', 'Japón', 'pregrado', 'Todas', 'Inglés', 'B1', 15, '2027-01-10', 'Pasajes y alojamiento', NULL, NULL, 'https://ejemplo.org/becas/9', true, false, true),
+('Diplomado Finanzas Sostenibles', 'Escuela Andes Business (ejemplo)', 'Colombia', 'curso', 'Economía, Negocios', 'Español', NULL, 13, '2026-11-05', 'Diplomado completo', NULL, NULL, 'https://ejemplo.org/becas/10', true, false, true),
+('Maestría en Educación Digital', 'Universidad del Norte (ejemplo)', 'Argentina', 'maestría', 'Educación, Tecnología', 'Español', NULL, 14, '2026-12-20', 'Matrícula 70 %', NULL, NULL, 'https://ejemplo.org/becas/11', true, false, true),
+('Beca Talento STEM', 'Fundación Kallpa (ejemplo)', 'Perú', 'pregrado', 'Ciencias, Ingeniería, Tecnología', 'Español', NULL, 16, '2026-11-20', 'Pensión, alimentación y mentoría', NULL, NULL, 'https://ejemplo.org/becas/12', true, false, true);
