@@ -15,6 +15,13 @@
       "when": 1791435910181,
       "tag": "0001_load_demo_scholarships_from_source",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791436028021,
+      "tag": "0002_scholarship_decisions",
+      "breakpoints": true
     }
   ]
 }

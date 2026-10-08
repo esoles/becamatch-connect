@@ -140,3 +140,14 @@ export function isMinor(birthDate: string, today = new Date()): boolean {
   limit.setFullYear(limit.getFullYear() - 18);
   return b > limit;
 }
+
+export const PRIORITY_SCORE = 50;
+export const MIN_DECK = 5;
+
+/** Splits eligible results into priority (score >= 50) and the rest; order is preserved. */
+export function splitPriority<R extends CompatResult>(eligible: R[]) {
+  return {
+    priority: eligible.filter((r) => r.compatibility_score >= PRIORITY_SCORE),
+    others: eligible.filter((r) => r.compatibility_score < PRIORITY_SCORE),
+  };
+}

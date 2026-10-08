@@ -116,6 +116,7 @@ function Header() {
           {signedIn ? (
             <>
               <Link to="/mazo" className={link} activeProps={active}>Mazo</Link>
+              <Link to="/mis-becas" className={link} activeProps={active}>Mis becas</Link>
               <Link to="/perfil" className={link} activeProps={active}>Perfil</Link>
               <button className={link} onClick={() => supabase.auth.signOut().then(() => (window.location.href = "/"))}>
                 Salir
