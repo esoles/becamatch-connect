@@ -72,12 +72,12 @@ function PerfilPage() {
       graduation_year: Number(f.graduation_year),
       languages: f.languages.filter((l) => l.code),
     });
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setSaving(true);
     const { data: u } = await supabase.auth.getUser();
     const { error } = await supabase.from("profiles").upsert({ id: u.user!.id, email, ...parsed.data });
     setSaving(false);
-    if (error) return toast.error("No se pudo guardar el perfil.");
+    if (error) { toast.error("No se pudo guardar el perfil."); return; }
     await qc.invalidateQueries({ queryKey: ["profile"] });
     toast.success("Perfil guardado");
     navigate({ to: "/mazo" });

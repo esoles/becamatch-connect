@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({ mode: s.mode === "login" ? ("login" as const) : undefined }),
+  validateSearch: (s: Record<string, unknown>): { mode?: "login" } => (s["mode"] === "login" ? { mode: "login" } : {}),
   head: () => ({
     meta: [
       { title: "Crear cuenta — BecaMatch" },
@@ -37,12 +37,12 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = schema.safeParse({ email, password });
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setLoading(true);
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword(parsed.data);
       setLoading(false);
-      if (error) return toast.error("No pudimos ingresar. Revisa tus datos.");
+      if (error) { toast.error("No pudimos ingresar. Revisa tus datos."); return; }
       navigate({ to: "/perfil" });
     } else {
       const { data, error } = await supabase.auth.signUp({
@@ -50,7 +50,7 @@ function AuthPage() {
         options: { emailRedirectTo: `${window.location.origin}/perfil` },
       });
       setLoading(false);
-      if (error) return toast.error(error.message);
+      if (error) { toast.error(error.message); return; }
       if (data.session) navigate({ to: "/perfil" });
       else setSent(true);
     }
