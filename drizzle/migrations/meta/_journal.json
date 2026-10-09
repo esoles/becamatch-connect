@@ -22,6 +22,13 @@
       "when": 1791436028021,
       "tag": "0002_scholarship_decisions",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791504296753,
+      "tag": "0003_user_roles",
+      "breakpoints": true
     }
   ]
 }
