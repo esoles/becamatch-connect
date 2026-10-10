@@ -1,4 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { sendTestNotice } from "@/lib/email.functions";
+import { answer, QUICK_QUESTIONS } from "@/lib/assistant";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -112,6 +116,70 @@ function Detail() {
           </>
         )}
       </div>
+
+      {current === "guardada" && <NoticeButton id={id} />}
+      <Assistant sch={sch} />
     </main>
+  );
+}
+
+function NoticeButton({ id }: { id: string }) {
+  const send = useServerFn(sendTestNotice);
+  const [state, setState] = useState<{ kind: "idle" | "sending" | "ok" | "error"; msg?: string }>({ kind: "idle" });
+  const go = async () => {
+    setState({ kind: "sending" });
+    try {
+      const r = await send({ data: { scholarshipId: id, appUrl: window.location.origin } });
+      if (r.ok) { setState({ kind: "ok", msg: `Aviso enviado a ${r.to}` }); toast.success("Aviso enviado"); }
+      else { setState({ kind: "error", msg: r.error }); toast.error("No se pudo enviar"); }
+    } catch (e) {
+      setState({ kind: "error", msg: e instanceof Error ? e.message : "Error inesperado" });
+    }
+  };
+  return (
+    <section className="mt-8 rounded-2xl border border-border bg-card p-4">
+      <h2 className="text-lg font-semibold">Aviso por correo</h2>
+      <p className="text-sm text-muted-foreground">Envía un correo de prueba a tu email con el nombre, la fecha límite y el enlace.</p>
+      <Button className="mt-3" onClick={go} disabled={state.kind === "sending"}>
+        {state.kind === "sending" ? "Enviando…" : "Enviar aviso de prueba"}
+      </Button>
+      {state.kind === "ok" && <p className="mt-2 text-sm font-medium text-primary">✓ {state.msg}</p>}
+      {state.kind === "error" && <p className="mt-2 text-sm font-medium text-destructive">✗ {state.msg}</p>}
+    </section>
+  );
+}
+
+function Assistant({ sch }: { sch: Parameters<typeof answer>[0] }) {
+  const [q, setQ] = useState("");
+  const [log, setLog] = useState<{ q: string; a: string; known: boolean }[]>([]);
+  const ask = (text: string) => {
+    if (!text.trim()) return;
+    const r = answer(sch, text);
+    setLog((l) => [...l, { q: text, a: r.text, known: r.known }]);
+    setQ("");
+  };
+  return (
+    <section className="mt-8 rounded-2xl border border-border bg-card p-4">
+      <h2 className="text-lg font-semibold">Asistente de la beca</h2>
+      <p className="text-sm text-muted-foreground">Responde solo con datos registrados de esta beca.</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {QUICK_QUESTIONS.map((x) => (
+          <button key={x} onClick={() => ask(x)} className="rounded-full bg-secondary px-3 py-1 text-xs font-medium">{x}</button>
+        ))}
+      </div>
+      <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); ask(q); }}>
+        <input value={q} onChange={(e) => setQ(e.target.value)} maxLength={200} placeholder="Escribe tu pregunta…"
+          className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm" />
+        <Button type="submit" size="sm">Preguntar</Button>
+      </form>
+      <ul className="mt-3 space-y-2">
+        {log.map((m, i) => (
+          <li key={i} className="text-sm">
+            <p className="font-medium">Tú: {m.q}</p>
+            <p className={m.known ? "text-foreground" : "text-muted-foreground italic"}>Asistente: {m.a}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
