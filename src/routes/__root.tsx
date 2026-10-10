@@ -99,9 +99,29 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function Header() {
   const [signedIn, setSignedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSignedIn(!!s));
+    const checkRole = async (userId: string | undefined) => {
+      if (!userId) {
+        setIsAdmin(false);
+        return;
+      }
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      setIsAdmin(!!data);
+    };
+    supabase.auth.getSession().then(({ data }) => {
+      setSignedIn(!!data.session);
+      void checkRole(data.session?.user.id);
+    });
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSignedIn(!!s);
+      void checkRole(s?.user.id);
+    });
     return () => data.subscription.unsubscribe();
   }, []);
   const link = "rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground";
