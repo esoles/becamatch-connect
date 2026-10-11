@@ -29,6 +29,13 @@
       "when": 1791504296753,
       "tag": "0003_user_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791678959827,
+      "tag": "0004_migration",
+      "breakpoints": true
     }
   ]
 }
