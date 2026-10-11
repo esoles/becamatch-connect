@@ -16,7 +16,9 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/mazo'
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as WhatsappVincularRouteImport } from './routes/whatsapp.vincular'
 import { Route as AuthenticatedBecaIdRouteImport } from './routes/_authenticated/beca.$id'
+import { Route as ApiPublicWhatsappRouteImport } from './routes/api/public/whatsapp'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,10 +54,20 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const WhatsappVincularRoute = WhatsappVincularRouteImport.update({
+  id: '/whatsapp/vincular',
+  path: '/whatsapp/vincular',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedBecaIdRoute = AuthenticatedBecaIdRouteImport.update({
   id: '/beca/$id',
   path: '/beca/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicWhatsappRoute = ApiPublicWhatsappRouteImport.update({
+  id: '/api/public/whatsapp',
+  path: '/api/public/whatsapp',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -65,7 +77,9 @@ export interface FileRoutesByFullPath {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/beca/$id': typeof AuthenticatedBecaIdRoute
+  '/api/public/whatsapp': typeof ApiPublicWhatsappRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -74,7 +88,9 @@ export interface FileRoutesByTo {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/beca/$id': typeof AuthenticatedBecaIdRoute
+  '/api/public/whatsapp': typeof ApiPublicWhatsappRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,15 +101,33 @@ export interface FileRoutesById {
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/_authenticated/beca/$id': typeof AuthenticatedBecaIdRoute
+  '/api/public/whatsapp': typeof ApiPublicWhatsappRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/admin' | '/mazo' | '/mis-becas' | '/perfil' | '/beca/$id'
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/mazo'
+    | '/mis-becas'
+    | '/perfil'
+    | '/whatsapp/vincular'
+    | '/beca/$id'
+    | '/api/public/whatsapp'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/admin' | '/mazo' | '/mis-becas' | '/perfil' | '/beca/$id'
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/mazo'
+    | '/mis-becas'
+    | '/perfil'
+    | '/whatsapp/vincular'
+    | '/beca/$id'
+    | '/api/public/whatsapp'
   id:
     | '__root__'
     | '/'
@@ -103,13 +137,17 @@ export interface FileRouteTypes {
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/whatsapp/vincular'
     | '/_authenticated/beca/$id'
+    | '/api/public/whatsapp'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  WhatsappVincularRoute: typeof WhatsappVincularRoute
+  ApiPublicWhatsappRoute: typeof ApiPublicWhatsappRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -163,12 +201,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/whatsapp/vincular': {
+      id: '/whatsapp/vincular'
+      path: '/whatsapp/vincular'
+      fullPath: '/whatsapp/vincular'
+      preLoaderRoute: typeof WhatsappVincularRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/beca/$id': {
       id: '/_authenticated/beca/$id'
       path: '/beca/$id'
       fullPath: '/beca/$id'
       preLoaderRoute: typeof AuthenticatedBecaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/whatsapp': {
+      id: '/api/public/whatsapp'
+      path: '/api/public/whatsapp'
+      fullPath: '/api/public/whatsapp'
+      preLoaderRoute: typeof ApiPublicWhatsappRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -196,6 +248,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  WhatsappVincularRoute: WhatsappVincularRoute,
+  ApiPublicWhatsappRoute: ApiPublicWhatsappRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

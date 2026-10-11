@@ -39,6 +39,7 @@ function AuthPage() {
     const parsed = schema.safeParse({ email, password });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setLoading(true);
+    const waPending = !!localStorage.getItem("wa_link_token");
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword(parsed.data);
       setLoading(false);
