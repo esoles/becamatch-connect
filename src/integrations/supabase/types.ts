@@ -178,6 +178,101 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_messages: {
+        Row: {
+          action: string | null
+          body: string
+          created_at: string
+          direction: string
+          id: string
+          phone: string
+          result: string | null
+          scholarship_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          body: string
+          created_at?: string
+          direction: string
+          id?: string
+          phone: string
+          result?: string | null
+          scholarship_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          body?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          phone?: string
+          result?: string | null
+          scholarship_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_scholarship_id_fkey"
+            columns: ["scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_sessions: {
+        Row: {
+          created_at: string
+          current_scholarship_id: string | null
+          link_token: string | null
+          link_token_expires_at: string | null
+          pending_action: string | null
+          pending_scholarship_id: string | null
+          phone: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_scholarship_id?: string | null
+          link_token?: string | null
+          link_token_expires_at?: string | null
+          pending_action?: string | null
+          pending_scholarship_id?: string | null
+          phone: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_scholarship_id?: string | null
+          link_token?: string | null
+          link_token_expires_at?: string | null
+          pending_action?: string | null
+          pending_scholarship_id?: string | null
+          phone?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_sessions_current_scholarship_id_fkey"
+            columns: ["current_scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_sessions_pending_scholarship_id_fkey"
+            columns: ["pending_scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
