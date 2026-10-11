@@ -43,15 +43,15 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithPassword(parsed.data);
       setLoading(false);
       if (error) { toast.error("No pudimos ingresar. Revisa tus datos."); return; }
-      navigate({ to: "/perfil" });
+      navigate({ to: waPending ? "/whatsapp/vincular" : "/perfil" });
     } else {
       const { data, error } = await supabase.auth.signUp({
         ...parsed.data,
-        options: { emailRedirectTo: `${window.location.origin}/perfil` },
+        options: { emailRedirectTo: `${window.location.origin}${waPending ? "/whatsapp/vincular" : "/perfil"}` },
       });
       setLoading(false);
       if (error) { toast.error(error.message); return; }
-      if (data.session) navigate({ to: "/perfil" });
+      if (data.session) navigate({ to: waPending ? "/whatsapp/vincular" : "/perfil" });
       else setSent(true);
     }
   }
