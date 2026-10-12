@@ -6,7 +6,7 @@ import { linkWhatsapp } from "@/lib/whatsapp.functions";
 
 export const Route = createFileRoute("/whatsapp/vincular")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>) => ({ t: typeof s.t === "string" ? s.t : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({ t: typeof s["t"] === "string" ? (s["t"] as string) : undefined }),
   head: () => ({
     meta: [
       { title: "Vincular WhatsApp — BecaMatch" },
