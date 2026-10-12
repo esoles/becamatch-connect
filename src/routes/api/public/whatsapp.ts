@@ -21,12 +21,15 @@ export const Route = createFileRoute("/api/public/whatsapp")({
         const expected = process.env["WHATSAPP_WEBHOOK_TOKEN"];
         const url = new URL(request.url);
         const token = url.searchParams.get("token") ?? "";
-        if (!expected || !safeEqual(token, expected)) return new Response("Forbidden", { status: 403 });
+        if (!expected) { console.error("whatsapp webhook: WHATSAPP_WEBHOOK_TOKEN not configured"); return new Response("Not configured", { status: 500 }); }
+        if (!safeEqual(token.trim(), expected.trim())) { console.warn("whatsapp webhook: invalid token"); return new Response("Forbidden", { status: 403 }); }
 
         const form = await request.formData();
-        const from = String(form.get("From") ?? "").replace(/^whatsapp:/, "").trim();
+        // Normalize to E.164 ("+" may arrive decoded as a space).
+        const digits = String(form.get("From") ?? "").replace(/^whatsapp:/, "").replace(/[^\d]/g, "");
+        const from = digits ? `+${digits}` : "";
         const body = String(form.get("Body") ?? "").trim().slice(0, 1000);
-        if (!/^\+?\d{6,16}$/.test(from) || !body) return twiml("No pude leer tu mensaje.");
+        if (!/^\+\d{6,16}$/.test(from) || !body) return twiml("No pude leer tu mensaje.");
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { handleIncoming } = await import("@/lib/whatsapp.server");
