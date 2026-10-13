@@ -8,7 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>): { mode?: "login" } => (s["mode"] === "login" ? { mode: "login" } : {}),
+  validateSearch: (s: Record<string, unknown>): { mode?: "login"; next?: "admin" } => ({
+    ...(s["mode"] === "login" ? { mode: "login" as const } : {}),
+    ...(s["next"] === "admin" ? { next: "admin" as const } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Crear cuenta — BecaMatch" },
@@ -25,34 +28,59 @@ const schema = z.object({
   password: z.string().min(8, "Mínimo 8 caracteres").max(72),
 });
 
+// Where to go after signing in. Access to /admin is still decided by the user's real role there.
+function destination(): "/admin" | "/whatsapp/vincular" | "/perfil" {
+  if (sessionStorage.getItem("post_login") === "admin") return "/admin";
+  if (localStorage.getItem("wa_link_token")) return "/whatsapp/vincular";
+  return "/perfil";
+}
+
 function AuthPage() {
-  const { mode } = Route.useSearch();
-  const [isLogin, setIsLogin] = useState(mode === "login");
+  const { mode, next } = Route.useSearch();
+  const [isLogin, setIsLogin] = useState(mode === "login" || next === "admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (next === "admin") sessionStorage.setItem("post_login", "admin");
+    // Returning from Google: once the session exists, continue to the intended page.
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) { const to = destination(); sessionStorage.removeItem("post_login"); navigate({ to }); }
+    });
+  }, [next, navigate]);
+
+  async function google() {
+    setLoading(true);
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth` });
+    if (r.redirected) return;
+    setLoading(false);
+    if (r.error) { toast.error("No pudimos ingresar con Google."); return; }
+    const to = destination(); sessionStorage.removeItem("post_login"); navigate({ to });
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = schema.safeParse({ email, password });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setLoading(true);
-    const waPending = !!localStorage.getItem("wa_link_token");
+    const to = destination();
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword(parsed.data);
       setLoading(false);
       if (error) { toast.error("No pudimos ingresar. Revisa tus datos."); return; }
-      navigate({ to: waPending ? "/whatsapp/vincular" : "/perfil" });
+      sessionStorage.removeItem("post_login");
+      navigate({ to });
     } else {
       const { data, error } = await supabase.auth.signUp({
         ...parsed.data,
-        options: { emailRedirectTo: `${window.location.origin}${waPending ? "/whatsapp/vincular" : "/perfil"}` },
+        options: { emailRedirectTo: `${window.location.origin}${to === "/admin" ? "/perfil" : to}` },
       });
       setLoading(false);
       if (error) { toast.error(error.message); return; }
-      if (data.session) navigate({ to: waPending ? "/whatsapp/vincular" : "/perfil" });
+      if (data.session) navigate({ to: to === "/admin" ? "/perfil" : to });
       else setSent(true);
     }
   }
