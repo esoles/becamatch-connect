@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,7 +98,7 @@ function AuthPage() {
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold">{isLogin ? "Ingresar" : "Crea tu cuenta"}</h1>
+            <h1 className="text-2xl font-bold">{next === "admin" ? "Ingreso administrativo" : isLogin ? "Ingresar" : "Crea tu cuenta"}</h1>
             <form onSubmit={submit} className="mt-6 space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
@@ -111,6 +112,10 @@ function AuthPage() {
                 {loading ? "Un momento…" : isLogin ? "Ingresar" : "Crear cuenta"}
               </Button>
             </form>
+            <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />o<span className="h-px flex-1 bg-border" /></div>
+            <Button type="button" variant="outline" className="h-11 w-full rounded-full" disabled={loading} onClick={google}>
+              Continuar con Google
+            </Button>
             <button className="mt-4 w-full text-center text-sm text-muted-foreground underline" onClick={() => setIsLogin(!isLogin)}>
               {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Ingresa"}
             </button>
