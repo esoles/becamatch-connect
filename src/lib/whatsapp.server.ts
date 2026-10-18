@@ -115,7 +115,7 @@ export async function handleIncoming(db: Admin, phone: string, body: string, ori
         reply = "Aún no tienes perfil en BecaMatch. Créalo en la web (sección Perfil) y vuelve a preguntarme.";
       } else {
         const today = new Date().toISOString().slice(0, 10);
-        const deck = buildDeck(prof as CompatProfile, all as never, today);
+        const deck = buildDeck(prof as unknown as CompatProfile, all as never, today);
         const top = deck.eligible.slice(0, 3);
         if (!top.length) {
           result = "sin_resultados";
