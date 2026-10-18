@@ -144,7 +144,9 @@ export const updateMarketingPost = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    const patch: { updated_at: string; status?: string; published_at?: string | null; content?: unknown } = {
+      updated_at: new Date().toISOString(),
+    };
     if (data.status) {
       patch.status = data.status;
       patch.published_at = data.status === "publicada" ? new Date().toISOString() : null;
@@ -191,7 +193,7 @@ export const listMarketingPosts = createServerFn({ method: "GET" })
         scholarshipName: (p.scholarships as { name: string } | null)?.name ?? "—",
         channel: p.channel,
         campaign: p.campaign,
-        content: p.content as MarketingContent,
+        content: p.content as unknown as MarketingContent,
         utmUrl: p.utm_url,
         status: p.status,
         publishedAt: p.published_at,
