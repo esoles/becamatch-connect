@@ -19,6 +19,7 @@ import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminMarketingRouteImport } from './routes/admin/marketing'
 import { Route as AdminPostulantesRouteImport } from './routes/admin/postulantes'
 import { Route as AdminSolicitudesRouteImport } from './routes/admin/solicitudes'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
@@ -76,6 +77,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminMarketingRoute = AdminMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminPostulantesRoute = AdminPostulantesRouteImport.update({
   id: '/postulantes',
   path: '/postulantes',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/marketing'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/marketing'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/admin/marketing'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
@@ -306,6 +318,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/marketing': {
+      id: '/admin/marketing'
+      path: '/marketing'
+      fullPath: '/admin/marketing'
+      preLoaderRoute: typeof AdminMarketingRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/postulantes': {
       id: '/admin/postulantes'
       path: '/postulantes'
@@ -378,6 +397,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
+  AdminMarketingRoute: typeof AdminMarketingRoute
   AdminPostulantesRoute: typeof AdminPostulantesRoute
   AdminSolicitudesRoute: typeof AdminSolicitudesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
@@ -386,6 +406,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminMarketingRoute: AdminMarketingRoute,
   AdminPostulantesRoute: AdminPostulantesRoute,
   AdminSolicitudesRoute: AdminSolicitudesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,

@@ -41,6 +41,7 @@ function AdminLayout() {
         <Link to="/admin" activeOptions={{ exact: true }} className={tab} activeProps={active}>Becas</Link>
         <Link to="/admin/solicitudes" className={tab} activeProps={active}>Solicitudes</Link>
         <Link to="/admin/postulantes" className={tab} activeProps={active}>Postulantes</Link>
+        <Link to="/admin/marketing" className={tab} activeProps={active}>Marketing</Link>
         <Link to="/admin/whatsapp" className={tab} activeProps={active}>WhatsApp</Link>
         <Link to="/admin/usuarios" className={tab} activeProps={active}>Administradores</Link>
       </nav>
