@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Compatibility scoring lives in pure functions in src/lib/compatibility.ts (tested); never compute it with AI or in the database — SPEC requires reproducibility.
+- Structured scholarship facts and provenance are normalized in src/lib/scholarship-orientation.ts and shared by detail, web assistant and WhatsApp; this keeps verification labels consistent without changing compatibility inputs.
 - Parental status is set by a DB trigger from birth_date so users cannot self-approve.
 - Signed-in pages live under src/routes/_authenticated/ and read data via the browser client with RLS.
 - Admin panel lives under src/routes/admin/ (own ssr:false guard checking has_role admin); new signups get 'student' via auth.users trigger and admins are only created by an admin server function — public signup can never grant admin.

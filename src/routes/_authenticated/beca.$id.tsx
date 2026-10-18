@@ -5,6 +5,7 @@ import { sendTestNotice } from "@/lib/email.functions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ScholarshipOrientation } from "@/components/scholarship-orientation";
 import { evaluate, WEIGHTS, type Criterion, type UserLanguage } from "@/lib/compatibility";
 import {
   clearDecision,
@@ -24,6 +25,8 @@ export const Route = createFileRoute("/_authenticated/beca/$id")({
       { name: "description", content: "Requisitos, documentos, fecha límite y enlace oficial de la beca." },
       { property: "og:title", content: "Detalle de beca — BecaMatch" },
       { property: "og:description", content: "Requisitos, documentos y enlace oficial." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Detail,
@@ -119,7 +122,7 @@ function Detail() {
         {r && Object.keys(r.components).length > 0 ? (
           <ul className="mt-3 divide-y divide-border text-sm">
             {(Object.keys(r.components) as Criterion[]).map((k) => {
-              const v = r.components[k]!;
+              const v = r.components[k] ?? 0;
               const st = criterionState(v);
               return (
                 <li key={k} className="flex items-center justify-between py-2">
@@ -137,6 +140,7 @@ function Detail() {
       <Block title="Cobertura y beneficios" text={sch.coverage} />
       <Block title="Requisitos de elegibilidad" text={sch.requirements} />
       <Block title="Documentos solicitados por la fuente oficial" text={sch.documents} />
+      <ScholarshipOrientation scholarship={sch} />
 
       <section className="mt-6">
         <h2 className="text-lg font-semibold">Enlace oficial</h2>
