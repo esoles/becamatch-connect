@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PostulationAgent } from "@/components/postulation-agent";
 import { ClipboardList, MessagesSquare, ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/postular")({
   head: () => ({
@@ -50,7 +51,8 @@ function PostulationForm() {
     setState("sending");
     setErrorMsg("");
     try {
-      const res = await submit({ data: { fullName, email, requestText } });
+      const { data: session } = await supabase.auth.getSession();
+      const res = await submit({ data: { fullName, email, requestText, accessToken: session.session?.access_token } });
       if (res.ok) setState("done");
       else {
         setState("error");

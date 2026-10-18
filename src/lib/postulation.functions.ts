@@ -5,6 +5,7 @@ const inputSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(200),
   requestText: z.string().trim().min(20).max(2000),
+  accessToken: z.string().max(5000).optional(),
 });
 
 type ScholarshipRow = {
@@ -100,10 +101,12 @@ export const submitPostulation = createServerFn({ method: "POST" })
   .inputValidator((d) => inputSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { verifiedIdentity } = await import("./agent-history.server");
+    const userId = await verifiedIdentity(data.accessToken);
 
     const { data: inserted, error: insErr } = await supabaseAdmin
       .from("postulation_requests")
-      .insert({ full_name: data.fullName, email: data.email, request_text: data.requestText, status: "recibida" })
+      .insert({ full_name: data.fullName, email: data.email, request_text: data.requestText, status: "recibida", user_id: userId })
       .select("id")
       .single();
     if (insErr || !inserted) {

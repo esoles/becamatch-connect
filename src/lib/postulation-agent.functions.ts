@@ -2,12 +2,22 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { agentProfileSchema } from "./postulation-agent";
 import { readPlan } from "./postulation-agent.server";
+import { resumeSchema } from "./agent-history.functions";
 
 export const generateAgentPlan = createServerFn({ method: "POST" })
   .inputValidator((input) =>
-    z.object({ profile: agentProfileSchema, confirmed: z.literal(true) }).parse(input),
+    resumeSchema.extend({ profile: agentProfileSchema, confirmed: z.literal(true) }).parse(input),
   )
-  .handler(async ({ data }) => readPlan(data.profile));
+  .handler(async ({ data }) => {
+    const { openConversation } = await import("./agent-history.server");
+    const { db } = await openConversation(data);
+    const plan = await readPlan(data.profile);
+    const result = await db.from("web_agent_plans").insert({ conversation_id: data.conversationId, plan: plan as unknown as import("@/integrations/supabase/types").Json });
+    if (result.error) throw new Error("No se pudo guardar el plan.");
+    const updated = await db.from("web_agent_conversations").update({ updated_at: new Date().toISOString() }).eq("id", data.conversationId);
+    if (updated.error) throw new Error("No se pudo actualizar la conversación.");
+    return plan;
+  });
 
 const escapeHtml = (value: string) =>
   value.replace(
