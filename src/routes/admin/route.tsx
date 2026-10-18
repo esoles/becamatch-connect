@@ -39,6 +39,7 @@ function AdminLayout() {
       </div>
       <nav className="mt-4 flex flex-wrap gap-1">
         <Link to="/admin" activeOptions={{ exact: true }} className={tab} activeProps={active}>Becas</Link>
+        <Link to="/admin/solicitudes" className={tab} activeProps={active}>Solicitudes</Link>
         <Link to="/admin/whatsapp" className={tab} activeProps={active}>WhatsApp</Link>
         <Link to="/admin/usuarios" className={tab} activeProps={active}>Administradores</Link>
       </nav>

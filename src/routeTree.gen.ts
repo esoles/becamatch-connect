@@ -18,6 +18,7 @@ import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminSolicitudesRouteImport } from './routes/admin/solicitudes'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
 import { Route as WhatsappVincularRouteImport } from './routes/whatsapp.vincular'
@@ -68,6 +69,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminSolicitudesRoute = AdminSolicitudesRouteImport.update({
+  id: '/solicitudes',
+  path: '/solicitudes',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
@@ -263,6 +275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/solicitudes': {
+      id: '/admin/solicitudes'
+      path: '/solicitudes'
+      fullPath: '/admin/solicitudes'
+      preLoaderRoute: typeof AdminSolicitudesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/usuarios': {
       id: '/admin/usuarios'
       path: '/usuarios'
@@ -319,12 +338,14 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
+  AdminSolicitudesRoute: typeof AdminSolicitudesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminWhatsappRoute: typeof AdminWhatsappRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminSolicitudesRoute: AdminSolicitudesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminWhatsappRoute: AdminWhatsappRoute,
   AdminIndexRoute: AdminIndexRoute,
