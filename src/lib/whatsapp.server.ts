@@ -89,6 +89,45 @@ export async function handleIncoming(db: Admin, phone: string, body: string, ori
       result = "descartada";
       reply = `Listo, descarté «${current.name}». Pregúntame por otra beca cuando quieras.`;
     }
+  } else if (/\b(ayuda|hola|como funciona|que es becamatch|inicio|menu)\b/.test(q)) {
+    action = "ayuda"; result = "explicacion";
+    reply = [
+      "👋 Soy el asistente de BecaMatch. Te ayudo a encontrar becas verificadas:",
+      "1) Crea tu perfil en la web (nivel, área, países, idiomas, promedio).",
+      "2) Te muestro becas ordenadas por compatibilidad (0-100).",
+      "3) Guardas las que te interesen y postulas en la convocatoria oficial (la postulación NO se hace aquí).",
+      "Escríbeme el nombre de una beca, «becas compatibles» o «ayuda con mi perfil».",
+    ].join("\n");
+  } else if (/\bperfil\b/.test(q) && /\b(ayuda|completar|crear|llenar|como)\b/.test(q)) {
+    action = "ayuda"; result = "orientacion_perfil";
+    reply = userId
+      ? "Tu WhatsApp ya está vinculado. Completa o revisa tu perfil en BecaMatch → sección Perfil: nivel de estudios, área, países de interés, idiomas y promedio (0-20). Con eso calculo tu compatibilidad con cada beca."
+      : "Para crear tu perfil entra a BecaMatch y pulsa «Crear mi perfil»: nivel de estudios, área, países de interés, idiomas y promedio (0-20). Luego puedes vincular este WhatsApp para guardar becas desde aquí.";
+  } else if (/\b(becas? compatibles?|recomienda|recomendacion|que becas|buscar becas?)\b/.test(q)) {
+    action = "compatibles";
+    if (!userId) {
+      result = "sin_perfil";
+      reply = "Para recomendarte becas compatibles necesito tu perfil. Regístrate en BecaMatch, complétalo y vincula este WhatsApp. Mientras tanto, escríbeme el nombre de una beca y te doy su información.";
+    } else {
+      const { data: prof } = await db.from("profiles").select("study_level, area, countries, languages, gpa").eq("id", userId).maybeSingle();
+      if (!prof) {
+        result = "sin_perfil";
+        reply = "Aún no tienes perfil en BecaMatch. Créalo en la web (sección Perfil) y vuelve a preguntarme.";
+      } else {
+        const today = new Date().toISOString().slice(0, 10);
+        const deck = buildDeck(prof as CompatProfile, all as never, today);
+        const top = deck.eligible.slice(0, 3);
+        if (!top.length) {
+          result = "sin_resultados";
+          reply = "Por ahora no hay becas verificadas compatibles con tu perfil. Revisa el mazo en BecaMatch más adelante.";
+        } else {
+          result = "listadas";
+          reply = "Tus 3 becas más compatibles:\n" +
+            top.map((r, i) => `${i + 1}) ${r.scholarship.name} — compatibilidad ${r.compatibility_score}/100, cierra ${fmtDate(r.scholarship.deadline)}.`).join("\n") +
+            "\nEscríbeme el nombre de una para ver detalles. Guárdalas desde BecaMatch o escribiendo GUARDAR aquí.";
+        }
+      }
+    }
   } else {
     const found = findScholarship(all, body);
     if (found) {
@@ -100,8 +139,18 @@ export async function handleIncoming(db: Admin, phone: string, body: string, ori
       action = "pregunta"; sid = current.id; result = a.known ? "dato_registrado" : "no_registrado";
       reply = `${a.text}\n${ASK}`;
     } else {
-      action = "consultar"; result = "no_encontrada";
-      reply = "No encontré esa beca en BecaMatch. Escribe su nombre, p. ej.: «Dame información de la BECA ABC».";
+      // Free-form orientation question: same AI and rules as the web assistant.
+      action = "pregunta"; result = "ia";
+      const verified = all.filter((s) => (s as { verified?: boolean }).verified);
+      const system = buildSystemPrompt({
+        scholarship: null,
+        channel: "whatsapp",
+        catalog: verified.map((s) => ({ name: s.name, entity: s.entity, country: s.country, deadline: s.deadline })),
+      });
+      const ai = await callAssistantAi(system, [{ role: "user", content: body }]);
+      reply = ai.ok
+        ? ai.reply
+        : "No pude responder eso ahora. Escríbeme el nombre de una beca, «becas compatibles» o «ayuda».";
     }
   }
 
