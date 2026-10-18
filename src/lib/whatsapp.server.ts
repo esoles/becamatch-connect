@@ -140,17 +140,15 @@ export async function handleIncoming(
       result = "sin_beca";
     } else if (userId) {
       sid = current.id;
-      const { error } = await db
-        .from("scholarship_decisions")
-        .upsert(
-          {
-            user_id: userId,
-            scholarship_id: current.id,
-            decision: "guardada",
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "user_id,scholarship_id" },
-        );
+      const { error } = await db.from("scholarship_decisions").upsert(
+        {
+          user_id: userId,
+          scholarship_id: current.id,
+          decision: "guardada",
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,scholarship_id" },
+      );
       result = error ? "error" : "guardada";
       reply = error
         ? "No pude guardarla ahora. Intenta de nuevo en unos minutos."
@@ -184,17 +182,15 @@ export async function handleIncoming(
     } else {
       sid = current.id;
       if (userId)
-        await db
-          .from("scholarship_decisions")
-          .upsert(
-            {
-              user_id: userId,
-              scholarship_id: current.id,
-              decision: "descartada",
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "user_id,scholarship_id" },
-          );
+        await db.from("scholarship_decisions").upsert(
+          {
+            user_id: userId,
+            scholarship_id: current.id,
+            decision: "descartada",
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,scholarship_id" },
+        );
       await db
         .from("whatsapp_sessions")
         .update({ current_scholarship_id: null, updated_at: new Date().toISOString() })
