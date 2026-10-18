@@ -4,6 +4,7 @@ export const stages = {
   nuevo: "Nuevo",
   contactado: "Contactado",
   preparando: "Preparando postulación",
+  postulado: "Postulado",
   seguimiento: "Postulación en seguimiento",
   ganado: "Ganado",
   perdido: "Perdido",
@@ -139,7 +140,7 @@ export function evaluatePriority(
       ? 20
       : 0;
   const plan = p.interactions.some((r) => r.plans.length) ? 20 : 0;
-  const progress = p.followup.stage === "preparando" || p.followup.stage === "seguimiento" ? 10 : 0;
+  const progress = ["preparando", "postulado", "seguimiento"].includes(p.followup.stage) ? 10 : 0;
   return {
     priority: recency + pending + interest + plan + progress,
     factors: [

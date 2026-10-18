@@ -271,7 +271,7 @@ export function ApplicantFollowupView({
         <summary className="cursor-pointer">Criterios de prioridad de seguimiento</summary>
         <p className="mt-2">
           Actividad en 7 días: 20 puntos; en 30 días: 10. Consulta pendiente: 15; más de 3 días: 30.
-          Becas guardadas o recomendadas: 20. Plan registrado: 20. Etapa Preparando o En seguimiento
+          Becas guardadas o recomendadas: 20. Plan registrado: 20. Etapa Preparando, Postulado o En seguimiento
           confirmada: 10. Proceso cerrado: 0. Sin interacciones suficientes: Sin evaluar. No mide
           elegibilidad ni probabilidad de obtener una beca.
         </p>

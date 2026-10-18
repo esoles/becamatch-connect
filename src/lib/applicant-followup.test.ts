@@ -30,6 +30,19 @@ const form: InboxInteraction = {
 };
 const now = Date.parse("2026-10-18T09:00:00Z");
 describe("applicant follow-up rules", () => {
+  it("submitted test case keeps its stage, next action and explained 30-point priority", () => {
+    const action = "Revisar el resultado en el portal oficial (caso ficticio de prueba)";
+    const people = groupApplicants({
+      profiles: [], calls: [], links: [], saved: [],
+      interactions: [{ ...form, title: "Ana · CASO DE PRUEBA", status: "atendida" }],
+      followups: [{ ...f, stage: "postulado", next_action: action }],
+    }, now);
+    expect(people[0]?.followup.stage).toBe("postulado");
+    expect(people[0]?.followup.next_action).toBe(action);
+    expect(people[0]?.priority).toBe(30);
+    expect(people[0]?.factors).toContain("Etapa confirmada: 10/10");
+    expect(people[0]?.response).toBe("answered");
+  });
   it("flags only strictly more than three days without response", () => {
     expect(overdue({ response: "pending", pendingSince: "2026-10-15T09:00:00Z" }, now)).toBe(false);
     expect(overdue({ response: "pending", pendingSince: "2026-10-15T08:59:59Z" }, now)).toBe(true);

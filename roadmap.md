@@ -1,5 +1,9 @@
 # Scholarship data expansion
 
+# Submitted application test case
+- [ ] Add Postulado to existing administrative stages and retain deterministic priority.
+- [ ] Persist an explicitly fictional Ana test case with next action and audit; verify admin readback.
+
 # Demo verification for testing
 - [x] Enable all 12 demo records for testing without changing provenance or official verification dates.
 - [x] Allow administrators to toggle demo verification and label it explicitly as testing.
