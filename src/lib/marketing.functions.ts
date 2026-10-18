@@ -154,7 +154,7 @@ export const updateMarketingPost = createServerFn({ method: "POST" })
     if (data.texto !== undefined) {
       const { data: row } = await supabaseAdmin.from("marketing_posts").select("content").eq("id", data.id).single();
       if (!row) return { ok: false as const, error: "Publicación no encontrada." };
-      patch.content = { ...(row.content as Record<string, unknown>), texto: data.texto };
+      patch.content = { ...(row.content as Record<string, unknown>), texto: data.texto } as import("@/integrations/supabase/types").Json;
     }
     const { error } = await supabaseAdmin.from("marketing_posts").update(patch).eq("id", data.id);
     if (error) return { ok: false as const, error: "No se pudo actualizar." };
