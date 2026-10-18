@@ -1,4 +1,9 @@
 # Scholarship data expansion
+
+# Central interaction inbox
+- [ ] Persist web-agent messages and generated plans with secure anonymous resumption.
+- [ ] Centralize forms, web-agent and WhatsApp in the existing admin section with filters, details and reliable related-record navigation.
+- [ ] Verify submission, conversation restoration, filtering, latest selection and backend authorization; WhatsApp delivery requires an active real integration.
  
 # Administrative navigation redesign
 - [x] Separate student navigation and role-restricted account menus.
