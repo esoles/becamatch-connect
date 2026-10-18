@@ -124,3 +124,16 @@
 @utility bg-hero {
   background-image: var(--gradient-hero);
 }
+
+.admin-space {
+  --background: oklch(0.972 0.006 170);
+  --card: oklch(0.998 0.002 170);
+  --border: oklch(0.90 0.012 170);
+  --sidebar: oklch(0.26 0.054 175);
+  --sidebar-foreground: oklch(0.97 0.012 170);
+  --sidebar-border: oklch(0.36 0.047 175);
+  --sidebar-accent: oklch(0.38 0.065 175);
+  --sidebar-accent-foreground: oklch(0.99 0.005 170);
+  --radius: 0.5rem;
+}
+.admin-space h1, .admin-space h2, .admin-space h3 { font-family: var(--font-sans); letter-spacing: 0; }
