@@ -38,7 +38,7 @@ export const askAssistant = createServerFn({ method: "POST" })
           `Requisitos: ${sch.requirements ?? "no registrados"}`,
           `Documentos requeridos: ${sch.documents ?? "no registrados"}`,
           `Promedio mínimo: ${sch.min_gpa ?? "no registrado"}`,
-          `Idioma: ${sch.language_code ?? "no registrado"}${sch.language_level ? " " + sch.language_level : ""}`,
+          `Idioma: ${sch.language_code ?? "no registrado"}${sch["language_level"] ? " " + sch["language_level"] : ""}`,
           `Enlace oficial: ${sch["official_url"] ?? "no registrado"}`,
         ].join("\n")
       : "El usuario no ha seleccionado ninguna beca.";

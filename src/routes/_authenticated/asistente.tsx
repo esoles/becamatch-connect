@@ -87,7 +87,7 @@ function AssistantPage() {
               <p className="font-semibold">{sch.name}</p>
               <p className="text-sm text-muted-foreground">{sch.entity} · {sch.country}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate({ to: "/asistente" })}>
+            <Button variant="outline" size="sm" onClick={() => navigate({ to: "/asistente", search: { beca: undefined } })}>
               Quitar contexto
             </Button>
           </div>
