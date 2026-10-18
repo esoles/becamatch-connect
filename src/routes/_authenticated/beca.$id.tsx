@@ -5,7 +5,7 @@ import { sendTestNotice } from "@/lib/email.functions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { evaluate, explain, type UserLanguage } from "@/lib/compatibility";
+import { evaluate, WEIGHTS, type Criterion, type UserLanguage } from "@/lib/compatibility";
 import {
   clearDecision,
   daysLeft,
@@ -29,6 +29,20 @@ export const Route = createFileRoute("/_authenticated/beca/$id")({
   component: Detail,
 });
 
+const CRITERION_LABEL: Record<Criterion, string> = {
+  level: "Nivel de estudio",
+  area: "Área",
+  language: "Idioma",
+  gpa: "Promedio",
+  country: "País",
+};
+
+function criterionState(v: number): { text: string; className: string } {
+  if (v === 100) return { text: "Coincide", className: "text-primary" };
+  if (v > 0) return { text: `Parcial (${v}/100)`, className: "text-foreground" };
+  return { text: "No coincide", className: "text-muted-foreground" };
+}
+
 function Detail() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
@@ -38,10 +52,17 @@ function Detail() {
 
   if (p.isLoading || s.isLoading || d.isLoading) return <p className="p-8 text-center text-muted-foreground">Cargando…</p>;
   const raw = s.data?.find((x) => x.id === id);
-  if (!raw)
+  const today = new Date().toISOString().slice(0, 10);
+  const unavailable = raw && (!raw.verified || raw.archived || raw.deadline <= today);
+  if (!raw || unavailable)
     return (
       <main className="mx-auto max-w-md px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold">Beca no encontrada</h1>
+        <h1 className="text-2xl font-bold">{!raw ? "Beca no encontrada" : "Beca no disponible"}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {!raw
+            ? "No existe una beca con este identificador."
+            : "Esta beca no está verificada o su fecha límite ya pasó, por eso no se muestra."}
+        </p>
         <Button asChild className="mt-6 rounded-full"><Link to="/mazo">Volver al mazo</Link></Button>
       </main>
     );
@@ -80,24 +101,56 @@ function Detail() {
       <h1 className="mt-2 text-3xl font-bold leading-tight">{sch.name}</h1>
       <p className="text-muted-foreground">{sch.entity} · {sch.country}</p>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 rounded-2xl border border-border bg-card p-4 text-sm sm:grid-cols-4">
-        <div><p className="text-muted-foreground">Compatibilidad</p><p className="text-xl font-bold">{r ? r.compatibility_score : "—"}/100</p></div>
-        <div><p className="text-muted-foreground">Fecha límite</p><p className="font-semibold">{fmtDate(sch.deadline)}</p></div>
-        <div><p className="text-muted-foreground">Días restantes</p><p className="font-semibold">{days > 0 ? days : "Expirada"}</p></div>
-        <div><p className="text-muted-foreground">Nivel</p><p className="font-semibold">{sch.study_level ?? "Cualquiera"}</p></div>
+      <div className="mt-6 grid grid-cols-2 gap-3 rounded-2xl border border-border bg-card p-4 text-sm sm:grid-cols-3">
+        <div><p className="text-muted-foreground">País</p><p className="font-semibold">{sch.country}</p></div>
+        <div><p className="text-muted-foreground">Nivel académico</p><p className="font-semibold">{sch.study_level ?? "Cualquiera"}</p></div>
+        <div><p className="text-muted-foreground">Área de estudio</p><p className="font-semibold">{sch.area ?? "Todas"}</p></div>
+        <div><p className="text-muted-foreground">Idioma requerido</p><p className="font-semibold">{sch.language_code ? `${sch.language_code}${sch.language_level ? " " + sch.language_level : ""}` : "No especificado"}</p></div>
+        <div><p className="text-muted-foreground">Promedio mínimo</p><p className="font-semibold">{sch.min_gpa != null ? `${sch.min_gpa} / 20` : "No especificado"}</p></div>
+        <div><p className="text-muted-foreground">Fecha límite</p><p className="font-semibold">{fmtDate(sch.deadline)} · {days > 0 ? `${days} días` : "Expirada"}</p></div>
       </div>
-      {r && <p className="mt-2 text-xs text-muted-foreground">{r.ineligibleReason ?? explain(r.components)}</p>}
 
-      <Block title="Requisitos" text={sch.requirements} />
-      <Block title="Documentos requeridos" text={sch.documents} />
-      {sch.coverage && <Block title="Cobertura" text={sch.coverage} />}
+      <section className="mt-6 rounded-2xl border border-border bg-card p-4">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-lg font-semibold">Tu compatibilidad</h2>
+          <p className="text-2xl font-bold">{r ? r.compatibility_score : "—"}<span className="text-sm font-normal text-muted-foreground">/100</span></p>
+        </div>
+        {r?.ineligibleReason && <p className="mt-1 text-sm font-medium text-destructive">{r.ineligibleReason}</p>}
+        {r && Object.keys(r.components).length > 0 ? (
+          <ul className="mt-3 divide-y divide-border text-sm">
+            {(Object.keys(r.components) as Criterion[]).map((k) => {
+              const v = r.components[k]!;
+              const st = criterionState(v);
+              return (
+                <li key={k} className="flex items-center justify-between py-2">
+                  <span>{CRITERION_LABEL[k]} <span className="text-xs text-muted-foreground">(peso {WEIGHTS[k]})</span></span>
+                  <span className={`font-medium ${st.className}`}>{st.text}</span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm text-muted-foreground">Completa tu perfil para ver el desglose.</p>
+        )}
+      </section>
+
+      <Block title="Cobertura y beneficios" text={sch.coverage} />
+      <Block title="Requisitos de elegibilidad" text={sch.requirements} />
+      <Block title="Documentos solicitados por la fuente oficial" text={sch.documents} />
 
       <section className="mt-6">
         <h2 className="text-lg font-semibold">Enlace oficial</h2>
         {sch.official_url ? (
-          <a href={sch.official_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block break-all text-sm font-medium text-primary underline">
-            {sch.official_url}
-          </a>
+          <>
+            <a href={sch.official_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block break-all text-sm font-medium text-primary underline">
+              {sch.official_url}
+            </a>
+            <div className="mt-3">
+              <Button asChild variant="outline">
+                <a href={sch.official_url} target="_blank" rel="noopener noreferrer">Ir a la convocatoria oficial ↗</a>
+              </Button>
+            </div>
+          </>
         ) : (
           <p className="mt-1 text-sm text-muted-foreground">No disponible.</p>
         )}
@@ -114,19 +167,12 @@ function Detail() {
             <Button onClick={() => decide("guardada")}>Guardar</Button>
           </>
         )}
+        <Button asChild variant="secondary">
+          <Link to="/asistente" search={{ beca: id }}>Consultar al asistente</Link>
+        </Button>
       </div>
 
       {current === "guardada" && <NoticeButton id={id} />}
-
-      <section className="mt-8 rounded-2xl border border-border bg-card p-4">
-        <h2 className="text-lg font-semibold">Asistente de orientación</h2>
-        <p className="text-sm text-muted-foreground">
-          Pregunta sobre requisitos, elegibilidad, cobertura, fechas y documentos de esta beca. El asistente responde con los datos reales registrados.
-        </p>
-        <Button asChild className="mt-3">
-          <Link to="/asistente" search={{ beca: id }}>Consultar al asistente</Link>
-        </Button>
-      </section>
     </main>
   );
 }
@@ -156,4 +202,3 @@ function NoticeButton({ id }: { id: string }) {
     </section>
   );
 }
-
