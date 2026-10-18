@@ -102,7 +102,7 @@ function AgentConversation({ initial, onBack }: { initial: SavedConversation; on
           {message.parts.map((part, i) => {
             if (part.type === "text") return <MessageResponse key={i}>{part.text}</MessageResponse>;
             if (part.type === "reasoning") return <Reasoning key={i} defaultOpen={false} isStreaming={part.state === "streaming"}><ReasoningTrigger /><ReasoningContent>{part.text}</ReasoningContent></Reasoning>;
-            if (isToolUIPart(part)) return <Tool key={i} defaultOpen={false}><ToolHeader type={part.type} state={part.state} title="Preparar resumen" /><ToolContent><ToolInput input={part.input} />{part.state === "output-error" && <p className="text-destructive">{part.errorText}</p>}</ToolContent></Tool>;
+            if (isToolUIPart(part) && part.type !== "dynamic-tool") return <Tool key={i} defaultOpen={false}><ToolHeader type={part.type} state={part.state} title="Preparar resumen" /><ToolContent><ToolInput input={part.input} />{part.state === "output-error" && <p className="text-destructive">{part.errorText}</p>}</ToolContent></Tool>;
             return null;
           })}
         </MessageContent>
