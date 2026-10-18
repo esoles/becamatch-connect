@@ -24,7 +24,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/admin/solicitudes")({
-  validateSearch: (s: Record<string, unknown>) => ({ id: typeof s.id === "string" ? s.id : undefined }),
+  validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({ id: typeof s["id"] === "string" ? s["id"] : undefined }),
   loader: ({ context }) => context.queryClient.ensureQueryData(solicitudesQuery),
   head: () => ({
     meta: [

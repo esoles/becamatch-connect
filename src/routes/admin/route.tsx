@@ -79,7 +79,7 @@ function AdminLayout() {
     },
   ] as const;
   const title =
-    groups.flatMap((g) => g.links).find((l) => l.to === pathname.replace(/\/$/, ""))?.label ??
+    groups.map((g) => g.links.find((l) => l.to === pathname.replace(/\/$/, ""))?.label).find(Boolean) ??
     "Administración";
   if (!isAdmin)
     return (

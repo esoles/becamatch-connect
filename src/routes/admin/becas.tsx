@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminScholarships } from "@/components/admin-scholarships";
 export const Route = createFileRoute("/admin/becas")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    id: typeof s.id === "string" ? s.id : undefined,
+  validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({
+    id: typeof s["id"] === "string" ? s["id"] : undefined,
   }),
   head: () => ({
     meta: [

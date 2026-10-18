@@ -36,7 +36,7 @@ export function AdminScholarships({
   selectedId,
 }: {
   verificationOnly?: boolean;
-  selectedId?: string;
+  selectedId?: string | undefined;
 }) {
   const query = useQuery(scholarshipsQuery);
   const client = useQueryClient();
