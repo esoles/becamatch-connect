@@ -82,6 +82,7 @@ function PostulationForm() {
   const [requestText, setRequestText] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [result, setResult] = useState<{ shareId: string; planNumber: string; emailAccepted: boolean; emailError: string | null } | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,7 +93,7 @@ function PostulationForm() {
       const res = await submit({
         data: { fullName, email, requestText, accessToken: session.session?.access_token },
       });
-      if (res.ok) setState("done");
+      if (res.ok) { setResult(res); setState("done"); }
       else {
         setState("error");
         setErrorMsg(res.error);
@@ -108,9 +109,14 @@ function PostulationForm() {
       <main className="mx-auto max-w-md px-4 py-16 text-center">
         <h1 className="font-display text-3xl font-bold">¡Gracias, {fullName.split(" ")[0]}!</h1>
         <p className="mt-3 text-muted-foreground">
-          Estamos preparando tu plan de postulación personalizado. Te llegará por correo a{" "}
-          <b>{email}</b> en unos minutos.
+          Tu plan {result?.planNumber} está guardado.
         </p>
+        <p className="mt-3 text-sm text-muted-foreground">{result?.emailAccepted ? "El servicio aceptó el correo con el enlace; la entrega aún no está confirmada." : result?.emailError}</p>
+        {result && <div className="mt-5 flex flex-wrap justify-center gap-3">
+          <Button asChild><Link to="/plan/$id" params={{ id: result.shareId }}>Consultar mi plan</Link></Button>
+          <Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/plan/${result.shareId}`); } catch { setErrorMsg("Abre el plan para copiar el enlace desde la barra de direcciones."); } }}>Copiar enlace</Button>
+        </div>}
+        {errorMsg && <p role="alert" className="mt-3 text-destructive">{errorMsg}</p>}
         <Button asChild className="mt-6">
           <Link to="/">Volver al inicio</Link>
         </Button>

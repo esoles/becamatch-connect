@@ -8,25 +8,7 @@ const inputSchema = z.object({
   accessToken: z.string().max(5000).optional(),
 });
 
-type ScholarshipRow = {
-  id: string;
-  name: string;
-  entity: string;
-  country: string;
-  deadline: string;
-  study_level: string | null;
-  area: string | null;
-  min_gpa: number | null;
-  coverage: string | null;
-  requirements: string | null;
-  documents: string | null;
-  official_url: string | null;
-  language_code: string | null;
-  language_level: string | null;
-};
-
-const esc = (t: string) =>
-  t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+type ScholarshipRow = import("./postulation-agent").PlanScholarship;
 
 async function analyzeWithAI(
   requestText: string,
@@ -107,106 +89,34 @@ async function analyzeWithAI(
   }
 }
 
-function buildEmailHtml(name: string, becas: ScholarshipRow[], appUrl: string): string {
-  const items = becas
-    .map((s) => {
-      const link = `${appUrl.replace(/\/$/, "")}/beca/${s.id}`;
-      return `<div style="border:1px solid #e5e5e5;border-radius:8px;padding:16px;margin:12px 0">
-      <h3 style="margin:0 0 4px">${esc(s.name)}</h3>
-      <p style="margin:2px 0;color:#555">${esc(s.entity)} · ${esc(s.country)}</p>
-      <p style="margin:2px 0"><b>Fecha límite:</b> ${esc(s.deadline)}</p>
-      ${s.coverage ? `<p style="margin:2px 0"><b>Cobertura:</b> ${esc(s.coverage)}</p>` : ""}
-      ${s.requirements ? `<p style="margin:2px 0"><b>Requisitos:</b> ${esc(s.requirements)}</p>` : ""}
-      ${s.documents ? `<p style="margin:2px 0"><b>Documentos:</b> ${esc(s.documents)}</p>` : ""}
-      ${s.official_url ? `<p style="margin:2px 0"><a href="${esc(s.official_url)}">Enlace oficial</a></p>` : ""}
-      <p style="margin:8px 0 0"><a href="${esc(link)}" style="background:#0d9488;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;display:inline-block">Ver en BecaMatch</a></p>
-    </div>`;
-    })
-    .join("");
-  return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
-    <h2>Hola ${esc(name)},</h2>
-    <p>Gracias por contarnos tu situación. Estas son las becas que mejor encajan contigo:</p>
-    ${items}
-    <p><b>Próximos pasos:</b> revisa los requisitos de cada beca, prepara los documentos indicados y postula desde el enlace oficial antes de la fecha límite.</p>
-    <p style="color:#888;font-size:12px">BecaMatch · Datos de demostración</p>
-  </div>`;
-}
-
 export const submitPostulation = createServerFn({ method: "POST" })
   .inputValidator((d) => inputSchema.parse(d))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
     const { verifiedIdentity } = await import("./agent-history.server");
+    const { verifiedCatalog, planForSelection, saveSharedPlan, sendStoredPlanEmail } = await import("./shared-plan.server");
     const userId = await verifiedIdentity(data.accessToken);
-
-    const { data: inserted, error: insErr } = await supabaseAdmin
-      .from("postulation_requests")
-      .insert({
-        full_name: data.fullName,
-        email: data.email,
-        request_text: data.requestText,
-        status: "recibida",
-        user_id: userId,
-      })
-      .select("id")
-      .single();
-    if (insErr || !inserted) {
-      console.error("insert postulation failed", insErr);
-      return {
-        ok: false as const,
-        error: "No se pudo registrar tu solicitud. Inténtalo de nuevo.",
-      };
-    }
-
-    const today = new Date().toISOString().slice(0, 10);
-    const { data: catalog } = await supabaseAdmin
-      .from("scholarships")
-      .select("*")
-      .eq("archived", false)
-      .gte("deadline", today)
-      .order("deadline");
-
-    const becas = (catalog ?? []) as ScholarshipRow[];
-    const analysis = await analyzeWithAI(data.requestText, becas);
-    // Fallback determinista: si la IA no eligió nada, las 3 becas con deadline más próxima.
-    const recommended = analysis.ids.length
-      ? analysis.ids.map((id) => becas.find((b) => b.id === id)!).filter(Boolean)
-      : becas.slice(0, 3);
-
-    await supabaseAdmin
-      .from("postulation_requests")
-      .update({
-        ai_analysis: analysis.needs as import("@/integrations/supabase/types").Json,
-        recommended_scholarship_ids: recommended.map((b) => b.id),
-        status: "analizada",
-      })
-      .eq("id", inserted.id);
-
-    const LOVABLE_API_KEY = process.env["LOVABLE_API_KEY"];
-    const RESEND_API_KEY = process.env["RESEND_API_KEY"];
-    let emailStatus = "error";
-    if (LOVABLE_API_KEY && RESEND_API_KEY && recommended.length) {
-      const appUrl = process.env["APP_URL"] ?? "https://becamatch-connect.lovable.app";
-      const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "X-Connection-Api-Key": RESEND_API_KEY,
-        },
-        body: JSON.stringify({
-          from: "BecaMatch <onboarding@resend.dev>",
-          to: [data.email],
-          subject: `Tu plan de postulación — BecaMatch`,
-          html: buildEmailHtml(data.fullName, recommended, appUrl),
-        }),
-      });
-      if (res.ok) emailStatus = "correo_enviado";
-      else console.error(`Resend failed [${res.status}]: ${await res.text()}`);
-    }
-    await supabaseAdmin
-      .from("postulation_requests")
-      .update({ status: emailStatus })
-      .eq("id", inserted.id);
-    return { ok: true as const };
+    const inserted = await db.from("postulation_requests").insert({
+      full_name: data.fullName, email: data.email, request_text: data.requestText,
+      status: "recibida", user_id: userId,
+    }).select("id").single();
+    if (inserted.error || !inserted.data) return { ok: false as const, error: "No se pudo registrar tu solicitud." };
+    const catalog = await verifiedCatalog(db);
+    const analysis = catalog.length ? await analyzeWithAI(data.requestText, catalog) : { needs: {}, ids: [] };
+    // AI selects only existing catalog IDs. No arbitrary closest-deadline fallback.
+    const selected = catalog.filter((s) => analysis.ids.includes(s.id));
+    const profileResult = userId ? await db.from("profiles").select("study_level,area,countries,languages,gpa").eq("id", userId).maybeSingle() : null;
+    if (profileResult?.error) throw new Error("No se pudo consultar tu perfil.");
+    const profile = profileResult?.data as unknown as import("./compatibility").CompatProfile | null;
+    const plan = await saveSharedPlan(db, planForSelection(selected, profile ?? null), { requestId: inserted.data.id, userId });
+    const updated = await db.from("postulation_requests").update({
+      ai_analysis: analysis.needs as import("@/integrations/supabase/types").Json,
+      recommended_scholarship_ids: selected.map((s) => s.id), status: "plan_generado",
+    }).eq("id", inserted.data.id);
+    if (updated.error) throw new Error("El plan se guardó, pero no se pudo actualizar la solicitud.");
+    const email = await sendStoredPlanEmail(db, plan.shareId, data.email);
+    const delivery = await db.from("postulation_requests").update({ status: email.ok ? "correo_enviado" : "plan_generado" }).eq("id", inserted.data.id);
+    if (delivery.error) throw new Error("No se pudo registrar el estado del correo.");
+    return { ok: true as const, shareId: plan.shareId, planNumber: plan.planNumber,
+      emailAccepted: email.ok, emailError: email.ok ? null : email.error ?? "Correo no disponible." };
   });
