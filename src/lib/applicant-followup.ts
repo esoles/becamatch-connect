@@ -44,6 +44,9 @@ export type Applicant = {
   suggestion: string;
 };
 const DAY = 86400000;
+export function recentApplicantsFirst(a: Pick<Applicant, "lastActivity" | "key">, b: Pick<Applicant, "lastActivity" | "key">) {
+  return (b.lastActivity ?? "").localeCompare(a.lastActivity ?? "") || a.key.localeCompare(b.key);
+}
 export function responseState(interactions: InboxInteraction[], calls: Call[], f: Followup) {
   if (f.stage === "ganado" || f.stage === "perdido")
     return { response: "answered" as const, pendingSince: null };
