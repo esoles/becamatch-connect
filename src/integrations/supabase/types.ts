@@ -67,6 +67,7 @@ export type Database = {
       postulation_requests: {
         Row: {
           ai_analysis: Json | null
+          attention_status: string
           created_at: string
           email: string
           full_name: string
@@ -74,9 +75,12 @@ export type Database = {
           recommended_scholarship_ids: string[]
           request_text: string
           status: string
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
           ai_analysis?: Json | null
+          attention_status?: string
           created_at?: string
           email: string
           full_name: string
@@ -84,9 +88,12 @@ export type Database = {
           recommended_scholarship_ids?: string[]
           request_text: string
           status?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
           ai_analysis?: Json | null
+          attention_status?: string
           created_at?: string
           email?: string
           full_name?: string
@@ -94,6 +101,8 @@ export type Database = {
           recommended_scholarship_ids?: string[]
           request_text?: string
           status?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -287,6 +296,94 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      web_agent_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          resume_token_hash: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          resume_token_hash: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          resume_token_hash?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      web_agent_messages: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          message: Json
+          sdk_message_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          message: Json
+          sdk_message_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          message?: Json
+          sdk_message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "web_agent_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "web_agent_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      web_agent_plans: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          plan: Json
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          plan: Json
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          plan?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "web_agent_plans_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "web_agent_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       whatsapp_messages: {
         Row: {
