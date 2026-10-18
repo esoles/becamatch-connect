@@ -322,12 +322,17 @@ function PersonDetail({
   const [target, setTarget] = useState(""),
     [evidence, setEvidence] = useState("");
   const timeline = [
-    ...p.interactions.map((r) => ({
-      date: r.lastActivity,
-      channel: r.channel,
-      text: r.preview,
+    ...p.interactions.flatMap((r) => r.messages.length ? r.messages.map(m => ({
+      date: m.date,
+      channel: `${r.channel} · ${m.direction === 'user' || m.direction === 'entrante' ? 'Entrante' : 'Respuesta registrada'}`,
+      text: m.body ?? m.message?.parts.filter(part => part.type === 'text').map(part => part.text).join(' ') ?? '',
       key: r.key,
-    })),
+    })) : [{
+      date: r.incomingAt ?? r.lastActivity,
+      channel: r.channel,
+      text: r.requestText ?? r.preview,
+      key: r.key,
+    }]),
     ...p.calls.map((c) => ({ date: c.occurred_at, channel: "Llamada", text: c.notes, key: "" })),
   ].sort((a, b) => b.date.localeCompare(a.date));
   async function persist() {
