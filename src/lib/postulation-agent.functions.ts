@@ -1,36 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { agentProfileSchema, makeAgentPlan } from "./postulation-agent";
-import type { Database } from "@/integrations/supabase/types";
+import { agentProfileSchema } from "./postulation-agent";
+import { readPlan } from "./postulation-agent.server";
 
-async function readPlan(profile: z.infer<typeof agentProfileSchema>) {
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["SUPABASE_ANON_KEY"];
-  if (!url || !key) throw new Error("No se puede consultar el catálogo ahora.");
-  const client = createClient<Database>(url, key, {
-    auth: { persistSession: false },
-    global: {
-      fetch: (input, init) => {
-        const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
-          headers.delete("Authorization");
-        headers.set("apikey", key);
-        return fetch(input, { ...init, headers });
-      },
-    },
-  });
-  const { data, error } = await client
-    .from("scholarships")
-    .select("*")
-    .eq("verified", true)
-    .eq("archived", false)
-    .eq("es_demo", false)
-    .eq("estado_datos", "verificada")
-    .gt("deadline", new Date().toISOString().slice(0, 10));
-  if (error) throw new Error("No se pudo consultar el catálogo de becas.");
-  return makeAgentPlan(profile, data ?? [], new Date().toISOString().slice(0, 10));
-}
 
 export const generateAgentPlan = createServerFn({ method: "POST" })
   .inputValidator((input) =>
