@@ -40,9 +40,24 @@ describe("applicant follow-up rules", () => {
       pendingSince: null,
     }));
   it("form attention edits do not reset the incoming timestamp", () =>
-    expect(responseState([{ ...form, incomingAt: "2026-10-10T09:00:00Z", lastActivity: "2026-10-18T08:00:00Z" }], [], f).pendingSince).toBe("2026-10-10T09:00:00Z"));
+    expect(
+      responseState(
+        [{ ...form, incomingAt: "2026-10-10T09:00:00Z", lastActivity: "2026-10-18T08:00:00Z" }],
+        [],
+        f,
+      ).pendingSince,
+    ).toBe("2026-10-10T09:00:00Z"));
   it("an answered channel cannot hide another unknown channel", () =>
-    expect(responseState([{ ...form, status: "atendida" }, { ...form, key: "form:b", processStatus: "correo_enviado" }], [], f).response).toBe("unknown"));
+    expect(
+      responseState(
+        [
+          { ...form, status: "atendida" },
+          { ...form, key: "form:b", processStatus: "correo_enviado" },
+        ],
+        [],
+        f,
+      ).response,
+    ).toBe("unknown"));
   it("closed stages suppress pending response", () => {
     for (const stage of ["ganado", "perdido"] as const)
       expect(responseState([form], [], { ...f, stage }).pendingSince).toBeNull();

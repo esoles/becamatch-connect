@@ -104,21 +104,19 @@ export const saveApplicantFollowup = createServerFn({ method: "POST" })
       .eq("person_key", data.personKey)
       .maybeSingle();
     if (previous.error) throw new Error("No se pudo leer el seguimiento.");
-    const r = await context.supabase
-      .from("applicant_followups")
-      .upsert({
-        person_key: data.personKey,
-        stage: data.stage,
-        next_action: data.nextAction,
-        followup_at: data.followupAt,
-        assigned_to: data.assignedTo,
-        objective: data.objective,
-        response_resolved_at: data.resolve
-          ? new Date().toISOString()
-          : (previous.data?.response_resolved_at ?? null),
-        updated_by: context.userId,
-        updated_at: new Date().toISOString(),
-      });
+    const r = await context.supabase.from("applicant_followups").upsert({
+      person_key: data.personKey,
+      stage: data.stage,
+      next_action: data.nextAction,
+      followup_at: data.followupAt,
+      assigned_to: data.assignedTo,
+      objective: data.objective,
+      response_resolved_at: data.resolve
+        ? new Date().toISOString()
+        : (previous.data?.response_resolved_at ?? null),
+      updated_by: context.userId,
+      updated_at: new Date().toISOString(),
+    });
     if (r.error) throw new Error("No se pudo guardar el seguimiento.");
     return { ok: true };
   });
@@ -148,16 +146,14 @@ export const recordApplicantCall = createServerFn({ method: "POST" })
       const u = await db.auth.admin.getUserById(data.userId);
       if (u.error || !u.data.user) throw new Error("Usuario no encontrado.");
     }
-    const r = await context.supabase
-      .from("applicant_calls")
-      .insert({
-        full_name: data.name,
-        user_id: data.userId,
-        occurred_at: data.occurredAt,
-        notes: data.notes,
-        requires_response: data.requiresResponse,
-        created_by: context.userId,
-      });
+    const r = await context.supabase.from("applicant_calls").insert({
+      full_name: data.name,
+      user_id: data.userId,
+      occurred_at: data.occurredAt,
+      notes: data.notes,
+      requires_response: data.requiresResponse,
+      created_by: context.userId,
+    });
     if (r.error) throw new Error("No se pudo registrar la llamada.");
     return { ok: true };
   });
@@ -176,9 +172,16 @@ export const confirmApplicantIdentity = createServerFn({ method: "POST" })
     if (role.error || !role.data) throw new Error("Solo administradores.");
     if (data.sourceKey.startsWith("user:") || data.sourceKey === data.targetKey)
       throw new Error("No se pueden fusionar cuentas autenticadas.");
-    const sourceFollowup = await context.supabase.from("applicant_followups").select("person_key").eq("person_key", data.sourceKey).maybeSingle();
+    const sourceFollowup = await context.supabase
+      .from("applicant_followups")
+      .select("person_key")
+      .eq("person_key", data.sourceKey)
+      .maybeSingle();
     if (sourceFollowup.error) throw new Error("No se pudo revisar el seguimiento original.");
-    if (sourceFollowup.data) throw new Error("Esta ficha tiene seguimiento propio. Consérvala separada para no perder decisiones administrativas.");
+    if (sourceFollowup.data)
+      throw new Error(
+        "Esta ficha tiene seguimiento propio. Consérvala separada para no perder decisiones administrativas.",
+      );
     const links = await context.supabase
       .from("applicant_identity_links")
       .select("source_key,target_key");
@@ -194,14 +197,12 @@ export const confirmApplicantIdentity = createServerFn({ method: "POST" })
       target = link.target_key;
     }
     if (target === data.sourceKey) throw new Error("Vínculo circular no permitido.");
-    const r = await context.supabase
-      .from("applicant_identity_links")
-      .insert({
-        source_key: data.sourceKey,
-        target_key: target,
-        evidence: data.evidence,
-        reviewed_by: context.userId,
-      });
+    const r = await context.supabase.from("applicant_identity_links").insert({
+      source_key: data.sourceKey,
+      target_key: target,
+      evidence: data.evidence,
+      reviewed_by: context.userId,
+    });
     if (r.error) throw new Error("No se pudo confirmar la identidad.");
     return { ok: true };
   });
