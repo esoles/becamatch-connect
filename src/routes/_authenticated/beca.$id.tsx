@@ -117,7 +117,16 @@ function Detail() {
       </div>
 
       {current === "guardada" && <NoticeButton id={id} />}
-      <Assistant sch={sch} />
+
+      <section className="mt-8 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-lg font-semibold">Asistente de orientación</h2>
+        <p className="text-sm text-muted-foreground">
+          Pregunta sobre requisitos, elegibilidad, cobertura, fechas y documentos de esta beca. El asistente responde con los datos reales registrados.
+        </p>
+        <Button asChild className="mt-3">
+          <Link to="/asistente" search={{ beca: id }}>Consultar al asistente</Link>
+        </Button>
+      </section>
     </main>
   );
 }
