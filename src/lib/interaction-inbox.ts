@@ -9,6 +9,7 @@ export type InboxInteraction = {
   title: string;
   userId: string | null;
   lastActivity: string;
+  incomingAt?: string;
   preview: string;
   status: string;
   email?: string;

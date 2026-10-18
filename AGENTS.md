@@ -16,3 +16,4 @@
 - Signed-in pages live under src/routes/_authenticated/ and read data via the browser client with RLS.
 - Admin panel lives under src/routes/admin/ (own ssr:false guard checking has_role admin); new signups get 'student' via auth.users trigger and admins are only created by an admin server function — public signup can never grant admin.
 - The admin shell owns sidebar navigation and excludes the public header; scholarship creation/editing/verification use role-checked server functions, while verification and overview labels share pure provenance rules so fictional demos never count as verified opportunities.
+- Unified applicant follow-up reuses the shared server inbox reader and pure grouping/priority/response rules; additive admin-only follow-up, manual-call and reviewed-identity records preserve source histories, with trigger-based append-only audit. This avoids duplicated transcripts and non-reproducible priority scoring.

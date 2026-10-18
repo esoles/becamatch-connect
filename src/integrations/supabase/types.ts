@@ -14,6 +14,129 @@ export type Database = {
   }
   public: {
     Tables: {
+      applicant_calls: {
+        Row: {
+          created_at: string
+          created_by: string
+          full_name: string
+          id: string
+          notes: string
+          occurred_at: string
+          requires_response: boolean
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          full_name?: string
+          id?: string
+          notes: string
+          occurred_at: string
+          requires_response?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          full_name?: string
+          id?: string
+          notes?: string
+          occurred_at?: string
+          requires_response?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      applicant_followup_audit: {
+        Row: {
+          actor_id: string
+          after_data: Json
+          before_data: Json | null
+          created_at: string
+          id: string
+          record_key: string
+          record_type: string
+        }
+        Insert: {
+          actor_id: string
+          after_data: Json
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          record_key: string
+          record_type: string
+        }
+        Update: {
+          actor_id?: string
+          after_data?: Json
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          record_key?: string
+          record_type?: string
+        }
+        Relationships: []
+      }
+      applicant_followups: {
+        Row: {
+          assigned_to: string | null
+          followup_at: string | null
+          next_action: string
+          objective: string
+          person_key: string
+          response_resolved_at: string | null
+          stage: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          followup_at?: string | null
+          next_action?: string
+          objective?: string
+          person_key: string
+          response_resolved_at?: string | null
+          stage?: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          assigned_to?: string | null
+          followup_at?: string | null
+          next_action?: string
+          objective?: string
+          person_key?: string
+          response_resolved_at?: string | null
+          stage?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: []
+      }
+      applicant_identity_links: {
+        Row: {
+          created_at: string
+          evidence: string
+          reviewed_by: string
+          source_key: string
+          target_key: string
+        }
+        Insert: {
+          created_at?: string
+          evidence: string
+          reviewed_by: string
+          source_key: string
+          target_key: string
+        }
+        Update: {
+          created_at?: string
+          evidence?: string
+          reviewed_by?: string
+          source_key?: string
+          target_key?: string
+        }
+        Relationships: []
+      }
       marketing_posts: {
         Row: {
           campaign: string
