@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,7 +67,7 @@ function SolicitudesPage() {
             <tbody>
               {visibleRows.map((r) => (
                 <tr key={r.id} className="border-t border-border">
-                  <td className="px-4 py-2 font-medium">{r.full_name}</td>
+                  <td className="px-4 py-2 font-medium"><Link to="/admin/whatsapp" search={{ interaction: `form:${r.id}` }} className="text-primary underline">{r.full_name}</Link></td>
                   <td className="px-4 py-2">{r.email}</td>
                   <td className="max-w-xs px-4 py-2"><span className="line-clamp-2">{r.request_text}</span></td>
                   <td className="px-4 py-2">{r.recommended_scholarship_ids.length}</td>
