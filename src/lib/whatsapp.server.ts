@@ -1,6 +1,9 @@
-// WhatsApp bot (server-only). Deterministic: answers only from stored scholarship data, reusing the detail-page assistant.
+// WhatsApp bot (server-only). Answers only from stored scholarship data, reusing the
+// shared assistant logic (assistant.server.ts) and the deterministic compatibility rules.
 import { answer } from "./assistant";
 import { fmtDate } from "./profile";
+import { buildSystemPrompt, callAssistantAi } from "./assistant.server";
+import { buildDeck, type CompatProfile } from "./compatibility";
 
 type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
 type Sch = {
