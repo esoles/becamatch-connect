@@ -19,6 +19,7 @@ import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminPostulantesRouteImport } from './routes/admin/postulantes'
 import { Route as AdminSolicitudesRouteImport } from './routes/admin/solicitudes'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
@@ -75,6 +76,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminPostulantesRoute = AdminPostulantesRouteImport.update({
+  id: '/postulantes',
+  path: '/postulantes',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminSolicitudesRoute = AdminSolicitudesRouteImport.update({
   id: '/solicitudes',
   path: '/solicitudes',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
@@ -294,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/postulantes': {
+      id: '/admin/postulantes'
+      path: '/postulantes'
+      fullPath: '/admin/postulantes'
+      preLoaderRoute: typeof AdminPostulantesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/solicitudes': {
       id: '/admin/solicitudes'
       path: '/solicitudes'
@@ -359,6 +378,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
+  AdminPostulantesRoute: typeof AdminPostulantesRoute
   AdminSolicitudesRoute: typeof AdminSolicitudesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminWhatsappRoute: typeof AdminWhatsappRoute
@@ -366,6 +386,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminPostulantesRoute: AdminPostulantesRoute,
   AdminSolicitudesRoute: AdminSolicitudesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminWhatsappRoute: AdminWhatsappRoute,
