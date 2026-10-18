@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PostularRouteImport } from './routes/postular'
+import { Route as AuthenticatedAsistenteRouteImport } from './routes/_authenticated/asistente'
 import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/mazo'
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
@@ -48,6 +49,11 @@ const PostularRoute = PostularRouteImport.update({
   id: '/postular',
   path: '/postular',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAsistenteRoute = AuthenticatedAsistenteRouteImport.update({
+  id: '/asistente',
+  path: '/asistente',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMazoRoute = AuthenticatedMazoRouteImport.update({
   id: '/mazo',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/postular': typeof PostularRoute
+  '/asistente': typeof AuthenticatedAsistenteRoute
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/postular': typeof PostularRoute
+  '/asistente': typeof AuthenticatedAsistenteRoute
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/postular': typeof PostularRoute
+  '/_authenticated/asistente': typeof AuthenticatedAsistenteRoute
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/postular'
+    | '/asistente'
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/postular'
+    | '/asistente'
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/postular'
+    | '/_authenticated/asistente'
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
@@ -246,6 +258,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/postular'
       preLoaderRoute: typeof PostularRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/asistente': {
+      id: '/_authenticated/asistente'
+      path: '/asistente'
+      fullPath: '/asistente'
+      preLoaderRoute: typeof AuthenticatedAsistenteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mazo': {
       id: '/_authenticated/mazo'
@@ -321,6 +340,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAsistenteRoute: typeof AuthenticatedAsistenteRoute
   AuthenticatedMazoRoute: typeof AuthenticatedMazoRoute
   AuthenticatedMisBecasRoute: typeof AuthenticatedMisBecasRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
@@ -328,6 +348,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAsistenteRoute: AuthenticatedAsistenteRoute,
   AuthenticatedMazoRoute: AuthenticatedMazoRoute,
   AuthenticatedMisBecasRoute: AuthenticatedMisBecasRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
