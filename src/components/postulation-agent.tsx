@@ -132,6 +132,7 @@ function AgentConversation({
   let profile: AgentProfile | null = null;
   for (const message of messages)
     for (const part of message.parts) {
+      if (message.role === "user") profile = null;
       if (
         isToolUIPart(part) &&
         part.type === "tool-prepare_profile" &&
