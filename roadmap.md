@@ -1,7 +1,7 @@
 # Scholarship data expansion
 
 # Submitted application test case
-- [ ] Keep Ana test case Postulado, add two further cases (Ganado with explicit fictional objective and Postulación en seguimiento), and verify newest-first admin ordering.
+- [x] Keep Ana test case Postulado, add María Ganado with explicit fictional objective and Luis Postulación en seguimiento; verified saved rows, priorities, next actions and newest-first ordering after reload; 16 tests passed.
 - [x] Add Postulado to existing administrative stages and retain deterministic priority; 15 tests passed.
 - [x] Persist an explicitly fictional Ana test case with next action and audit; verified admin row, detail and reload at 30/100.
 
