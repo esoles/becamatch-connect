@@ -10,6 +10,7 @@ import {
   stages,
   overdue,
   evaluatePriority,
+  recentApplicantsFirst,
   type Applicant,
   type Stage,
 } from "@/lib/applicant-followup";
@@ -59,7 +60,7 @@ export function ApplicantFollowupView({
     [stage, setStage] = useState("todos"),
     [assignee, setAssignee] = useState("todos"),
     [alert, setAlert] = useState("todos"),
-    [order, setOrder] = useState("priority");
+    [order, setOrder] = useState("activity");
   const [selected, setSelected] = useState<string | null>(null),
     [calling, setCalling] = useState(false);
   const evaluated = people.map((p) => ({ ...p, ...evaluatePriority(p, now) }));
@@ -82,7 +83,7 @@ export function ApplicantFollowupView({
       order === "priority"
         ? (b.priority ?? -1) - (a.priority ?? -1) || a.key.localeCompare(b.key)
         : order === "activity"
-          ? (b.lastActivity ?? "").localeCompare(a.lastActivity ?? "")
+          ? recentApplicantsFirst(a, b)
           : order === "date"
             ? (a.followup.followup_at ?? "9999").localeCompare(b.followup.followup_at ?? "9999")
             : (a.pendingSince ?? "9999").localeCompare(b.pendingSince ?? "9999"),
@@ -193,7 +194,7 @@ export function ApplicantFollowupView({
           onChange={(e) => setOrder(e.target.value)}
         >
           <option value="priority">Mayor prioridad primero</option>
-          <option value="activity">Última interacción</option>
+          <option value="activity">Más recientes primero</option>
           <option value="date">Fecha de seguimiento</option>
           <option value="pending">Antigüedad pendiente</option>
         </select>

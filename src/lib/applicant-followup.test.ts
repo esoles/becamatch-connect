@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   evaluatePriority,
+  recentApplicantsFirst,
   groupApplicants,
   overdue,
   responseState,
@@ -30,6 +31,14 @@ const form: InboxInteraction = {
 };
 const now = Date.parse("2026-10-18T09:00:00Z");
 describe("applicant follow-up rules", () => {
+  it("orders most recent applicants before older and undated records", () => {
+    const rows = [
+      { key: "old", lastActivity: "2026-10-18T16:30:00Z" },
+      { key: "missing", lastActivity: null },
+      { key: "new", lastActivity: "2026-10-18T16:38:00Z" },
+    ];
+    expect(rows.sort(recentApplicantsFirst).map((p) => p.key)).toEqual(["new", "old", "missing"]);
+  });
   it("submitted test case keeps its stage, next action and explained 30-point priority", () => {
     const action = "Revisar el resultado en el portal oficial (caso ficticio de prueba)";
     const people = groupApplicants({
