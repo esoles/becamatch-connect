@@ -19,6 +19,7 @@ import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminAsistenteRouteImport } from './routes/admin/asistente'
 import { Route as AdminBecasRouteImport } from './routes/admin/becas'
 import { Route as AdminMarketingRouteImport } from './routes/admin/marketing'
 import { Route as AdminPostulantesRouteImport } from './routes/admin/postulantes'
@@ -78,6 +79,11 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminAsistenteRoute = AdminAsistenteRouteImport.update({
+  id: '/asistente',
+  path: '/asistente',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminBecasRoute = AdminBecasRouteImport.update({
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/asistente': typeof AdminAsistenteRoute
   '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/asistente': typeof AdminAsistenteRoute
   '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/asistente': typeof AdminAsistenteRoute
   '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/asistente'
     | '/admin/becas'
     | '/admin/marketing'
     | '/admin/postulantes'
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/asistente'
     | '/admin/becas'
     | '/admin/marketing'
     | '/admin/postulantes'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/admin/asistente'
     | '/admin/becas'
     | '/admin/marketing'
     | '/admin/postulantes'
@@ -354,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/asistente': {
+      id: '/admin/asistente'
+      path: '/asistente'
+      fullPath: '/admin/asistente'
+      preLoaderRoute: typeof AdminAsistenteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/becas': {
@@ -456,6 +475,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
+  AdminAsistenteRoute: typeof AdminAsistenteRoute
   AdminBecasRoute: typeof AdminBecasRoute
   AdminMarketingRoute: typeof AdminMarketingRoute
   AdminPostulantesRoute: typeof AdminPostulantesRoute
@@ -467,6 +487,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminAsistenteRoute: AdminAsistenteRoute,
   AdminBecasRoute: AdminBecasRoute,
   AdminMarketingRoute: AdminMarketingRoute,
   AdminPostulantesRoute: AdminPostulantesRoute,
