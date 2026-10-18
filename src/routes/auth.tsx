@@ -15,6 +15,8 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Crear cuenta — BecaMatch" },
       { name: "description", content: "Regístrate o ingresa a BecaMatch para ver tus becas compatibles." },
       { property: "og:title", content: "Crear cuenta — BecaMatch" },

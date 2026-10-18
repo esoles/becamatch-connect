@@ -79,8 +79,9 @@ function AdminLayout() {
     },
   ] as const;
   const title =
-    groups.map((g) => g.links.find((l) => l.to === pathname.replace(/\/$/, ""))?.label).find(Boolean) ??
-    "Administración";
+    groups
+      .map((g) => g.links.find((l) => l.to === pathname.replace(/\/$/, ""))?.label)
+      .find(Boolean) ?? "Administración";
   if (!isAdmin)
     return (
       <main className="mx-auto max-w-md px-4 py-16 text-center">

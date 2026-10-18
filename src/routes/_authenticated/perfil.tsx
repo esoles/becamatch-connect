@@ -14,6 +14,8 @@ import { PARENTAL_LABEL, profileQuery } from "@/lib/profile";
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Mi perfil — BecaMatch" },
       { name: "description", content: "Completa tu perfil académico para calcular tu compatibilidad con becas." },
       { property: "og:title", content: "Mi perfil — BecaMatch" },
