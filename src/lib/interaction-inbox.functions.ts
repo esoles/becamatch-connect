@@ -28,7 +28,7 @@ export const listInteractions = createServerFn({ method: "GET" }).middleware([re
     all((a,b) => db.from("profiles").select("id,full_name").order("id").range(a,b)),
   ]);
   const names = new Map(profiles.map((p) => [p.id,p.full_name]));
-  const rows: InboxInteraction[] = requests.map((r) => ({ key: `form:${r.id}`, id: r.id, channel: "Formulario", title: r.full_name, userId: r.user_id, lastActivity: r.updated_at > r.created_at ? r.updated_at : r.created_at, preview: r.request_text.slice(0,160), status: r.attention_status, processStatus: r.status, email: r.email, requestText: r.request_text, analysis: r.ai_analysis, scholarshipIds: r.recommended_scholarship_ids, messages: [], plans: [] }));
+  const rows: InboxInteraction[] = requests.map((r) => ({ key: `form:${r.id}`, id: r.id, channel: "Formulario", title: r.full_name, userId: r.user_id, lastActivity: r.attention_status === "recibida" ? r.created_at : r.updated_at, preview: r.request_text.slice(0,160), status: r.attention_status, processStatus: r.status, email: r.email, requestText: r.request_text, analysis: r.ai_analysis, scholarshipIds: r.recommended_scholarship_ids, messages: [], plans: [] }));
   for (const c of conversations) {
     const transcript = messages.filter((m) => m.conversation_id === c.id).map((m) => ({ id: m.id, date: m.created_at, direction: (m.message as unknown as UIMessage).role, message: m.message as unknown as UIMessage }));
     const savedPlans = plans.filter((p) => p.conversation_id === c.id).map((p) => ({ date: p.created_at, plan: p.plan as unknown as AgentPlan }));

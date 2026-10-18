@@ -108,17 +108,8 @@ function AgentConversation({
   const [mailState, setMailState] = useState<"idle" | "sending" | "sent">("idle");
   const [problem, setProblem] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const planRef = useRef(plan);
-  planRef.current = plan;
   const generate = useServerFn(generateAgentPlan);
   const sendEmail = useServerFn(emailAgentPlan);
-  const persist = (_messages: UIMessage[], _value: AgentPlan | null) => {
-    try {
-      localStorage.setItem(AGENT_STORAGE_KEY, JSON.stringify({ conversationId: initial.conversationId, resumeToken: initial.resumeToken }));
-    } catch {
-      setProblem("No se pudo conservar la conversación en este navegador.");
-    }
-  };
   const { messages, sendMessage, status, stop } = useChat({
     id: initial.conversationId,
     messages: initial.messages,
@@ -126,8 +117,7 @@ function AgentConversation({
       const { data } = await supabase.auth.getSession();
       return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {};
     } }),
-    onFinish: ({ messages: completed }) => {
-      persist(completed, planRef.current);
+    onFinish: () => {
       textareaRef.current?.focus();
     },
     onError: (error) => {
@@ -139,9 +129,6 @@ function AgentConversation({
   useEffect(() => {
     if (!busy) textareaRef.current?.focus();
   }, [busy]);
-  useEffect(() => {
-    persist(messages, plan);
-  }, [messages, plan]);
 
   let profile: AgentProfile | null = null;
   for (const message of messages)
