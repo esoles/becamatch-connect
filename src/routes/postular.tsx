@@ -1,0 +1,96 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { submitPostulation } from "@/lib/postulation.functions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+
+export const Route = createFileRoute("/postular")({
+  head: () => ({
+    meta: [
+      { title: "Quiero postular — BecaMatch" },
+      { name: "description", content: "Cuéntanos tu situación y recibe un plan de postulación con becas reales que encajan contigo." },
+      { property: "og:title", content: "Quiero postular — BecaMatch" },
+      { property: "og:description", content: "Recibe un plan de postulación personalizado con becas reales." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: PostularPage,
+});
+
+function PostularPage() {
+  const submit = useServerFn(submitPostulation);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [requestText, setRequestText] = useState("");
+  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setState("sending");
+    setErrorMsg("");
+    try {
+      const res = await submit({ data: { fullName, email, requestText } });
+      if (res.ok) setState("done");
+      else {
+        setState("error");
+        setErrorMsg(res.error);
+      }
+    } catch {
+      setState("error");
+      setErrorMsg("Revisa los datos del formulario e inténtalo de nuevo.");
+    }
+  }
+
+  if (state === "done")
+    return (
+      <main className="mx-auto max-w-md px-4 py-16 text-center">
+        <h1 className="font-display text-3xl font-bold">¡Gracias, {fullName.split(" ")[0]}!</h1>
+        <p className="mt-3 text-muted-foreground">
+          Estamos preparando tu plan de postulación personalizado. Te llegará por correo a <b>{email}</b> en unos minutos.
+        </p>
+        <Button asChild className="mt-6"><Link to="/">Volver al inicio</Link></Button>
+      </main>
+    );
+
+  return (
+    <main className="mx-auto max-w-lg px-4 py-10">
+      <h1 className="font-display text-3xl font-bold">Quiero postular</h1>
+      <p className="mt-2 text-muted-foreground">
+        Cuéntanos tu situación y nuestra IA buscará las becas reales que mejor encajan contigo. Recibirás un plan de postulación por correo.
+      </p>
+      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+        <div>
+          <Label htmlFor="fullName">Nombre completo</Label>
+          <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required minLength={2} maxLength={120} />
+        </div>
+        <div>
+          <Label htmlFor="email">Correo electrónico</Label>
+          <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={200} />
+        </div>
+        <div>
+          <Label htmlFor="requestText">Cuéntanos tu situación</Label>
+          <Textarea
+            id="requestText"
+            value={requestText}
+            onChange={(e) => setRequestText(e.target.value)}
+            required
+            minLength={20}
+            maxLength={2000}
+            rows={6}
+            placeholder="Ejemplo: Estoy en último año de Ingeniería, mi promedio es 16/20, me interesan becas de maestría en Alemania o Canadá y tengo inglés B2."
+          />
+          <p className="mt-1 text-xs text-muted-foreground">Incluye tu nivel de estudios, área, promedio, países de interés e idiomas.</p>
+        </div>
+        {state === "error" && <p className="text-sm text-destructive">{errorMsg}</p>}
+        <Button type="submit" className="w-full" disabled={state === "sending"}>
+          {state === "sending" ? "Enviando…" : "Recibir mi plan de postulación"}
+        </Button>
+      </form>
+    </main>
+  );
+}
