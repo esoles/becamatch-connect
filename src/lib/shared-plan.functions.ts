@@ -1,10 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { setResponseHeader } from "@tanstack/react-start/server";
 import { sharedPlanSchema } from "./shared-plan";
 
 export const getSharedPlan = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
+    setResponseHeader("Cache-Control", "private, no-store");
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
     // The 122-bit share capability, not the sequential display number, authorizes this safe projection.
     const row = await db.from("web_agent_plans").select("plan_number,shared_content,created_at")

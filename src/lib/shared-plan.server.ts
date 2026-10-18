@@ -1,6 +1,7 @@
 import type { AgentPlan, AgentProfile, PlanScholarship } from "./postulation-agent";
 import { shareablePlan, selectedOpportunity, PLAN_STEPS } from "./shared-plan";
 import type { CompatProfile } from "./compatibility";
+import { isAvailable } from "./compatibility";
 import type { Json } from "@/integrations/supabase/types";
 
 type Db = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
@@ -16,10 +17,11 @@ export async function verifiedCatalog(db: Db) {
   return result.data;
 }
 export function planForSelection(catalog: PlanScholarship[], profile: CompatProfile | null): AgentPlan {
+  const verified = catalog.filter((s) => !s.es_demo && s.estado_datos === "verificada" && isAvailable(s, new Date().toISOString().slice(0, 10)));
   return {
     profile: blankPlanProfile,
-    opportunities: catalog.map((s) => selectedOpportunity(s, profile)),
-    notice: catalog.length
+    opportunities: verified.map((s) => selectedOpportunity(s, profile)),
+    notice: verified.length
       ? "Plan de orientación con datos verificados. Confirma los datos faltantes y la vigencia en cada fuente oficial."
       : "No hay una beca real verificada y vigente identificada. Indica el nombre o enlace oficial de la beca y completa nivel, área, promedio e idiomas; no se incluyen ejemplos ficticios.",
     steps: PLAN_STEPS,
