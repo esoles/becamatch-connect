@@ -13,10 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PostularRouteImport } from './routes/postular'
 import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/mazo'
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminSolicitudesRouteImport } from './routes/admin/solicitudes'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
 import { Route as WhatsappVincularRouteImport } from './routes/whatsapp.vincular'
@@ -42,6 +44,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PostularRoute = PostularRouteImport.update({
+  id: '/postular',
+  path: '/postular',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedMazoRoute = AuthenticatedMazoRouteImport.update({
   id: '/mazo',
   path: '/mazo',
@@ -60,6 +67,11 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSolicitudesRoute = AdminSolicitudesRouteImport.update({
+  id: '/solicitudes',
+  path: '/solicitudes',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
@@ -92,9 +104,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/postular': typeof PostularRoute
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
@@ -105,9 +119,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/postular': typeof PostularRoute
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
@@ -121,9 +137,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/postular': typeof PostularRoute
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
@@ -137,9 +155,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/postular'
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
@@ -150,9 +170,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/postular'
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
@@ -165,9 +187,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/admin'
     | '/auth'
+    | '/postular'
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/admin/solicitudes'
     | '/admin/usuarios'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
@@ -181,6 +205,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PostularRoute: typeof PostularRoute
   WhatsappVincularRoute: typeof WhatsappVincularRoute
   ApiPublicWhatsappRoute: typeof ApiPublicWhatsappRoute
 }
@@ -215,6 +240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/postular': {
+      id: '/postular'
+      path: '/postular'
+      fullPath: '/postular'
+      preLoaderRoute: typeof PostularRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/mazo': {
       id: '/_authenticated/mazo'
       path: '/mazo'
@@ -241,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/solicitudes': {
+      id: '/admin/solicitudes'
+      path: '/solicitudes'
+      fullPath: '/admin/solicitudes'
+      preLoaderRoute: typeof AdminSolicitudesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/usuarios': {
@@ -299,12 +338,14 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
+  AdminSolicitudesRoute: typeof AdminSolicitudesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminWhatsappRoute: typeof AdminWhatsappRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminSolicitudesRoute: AdminSolicitudesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminWhatsappRoute: AdminWhatsappRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -319,6 +360,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  PostularRoute: PostularRoute,
   WhatsappVincularRoute: WhatsappVincularRoute,
   ApiPublicWhatsappRoute: ApiPublicWhatsappRoute,
 }

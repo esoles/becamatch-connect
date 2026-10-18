@@ -37,6 +37,9 @@ function Landing() {
             <Button asChild size="lg" className="h-12 rounded-full px-8 text-base">
               <Link to="/auth">Crear mi perfil</Link>
             </Button>
+            <Button asChild variant="secondary" size="lg" className="h-12 rounded-full px-8 text-base">
+              <Link to="/postular">Quiero postular</Link>
+            </Button>
             <Button asChild variant="ghost" size="lg" className="h-12 rounded-full">
               <Link to="/auth" search={{ mode: "login" }}>Ya tengo cuenta</Link>
             </Button>
