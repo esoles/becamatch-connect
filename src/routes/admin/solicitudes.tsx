@@ -24,6 +24,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/admin/solicitudes")({
+  validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({ id: typeof s["id"] === "string" ? s["id"] : undefined }),
   loader: ({ context }) => context.queryClient.ensureQueryData(solicitudesQuery),
   head: () => ({
     meta: [
@@ -40,6 +41,8 @@ export const Route = createFileRoute("/admin/solicitudes")({
 
 function SolicitudesPage() {
   const { data: rows } = useSuspenseQuery(solicitudesQuery);
+  const { id } = Route.useSearch();
+  const visibleRows = id ? rows.filter(r => r.id === id) : rows;
   return (
     <section className="mt-6">
       <h2 className="font-display text-xl font-semibold">Solicitudes de postulación</h2>
@@ -62,7 +65,7 @@ function SolicitudesPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {visibleRows.map((r) => (
                 <tr key={r.id} className="border-t border-border">
                   <td className="px-4 py-2 font-medium">{r.full_name}</td>
                   <td className="px-4 py-2">{r.email}</td>

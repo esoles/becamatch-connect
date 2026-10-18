@@ -8,6 +8,8 @@ import type { Tables } from "@/integrations/supabase/types";
 export const Route = createFileRoute("/_authenticated/mis-becas")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Mis becas — BecaMatch" },
       { name: "description", content: "Tus becas guardadas, días restantes, expiradas y descartadas recuperables." },
       { property: "og:title", content: "Mis becas — BecaMatch" },

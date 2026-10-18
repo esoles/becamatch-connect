@@ -1,4 +1,13 @@
 # Scholarship data expansion
+ 
+# Administrative navigation redesign
+- [x] Separate student navigation and role-restricted account menus.
+- [x] Replace admin tabs with grouped sidebar and mobile navigation.
+- [x] Add operational summary based on real records and labeled demo data.
+- [x] Add scholarship search, filters, editing and explicit source verification using existing records.
+- [x] Verify admin edit/readback, signed-out restrictions and mobile layout; source verification of a real scholarship awaits real source-backed records (catalog currently has only fictitious demos).
+
+# Previous work
 - [x] Add structured orientation fields without replacing existing data.
 - [x] Import 12 enriched examples into matching existing scholarships.
 - [x] Connect shared assistant and scholarship detail with provenance warnings.

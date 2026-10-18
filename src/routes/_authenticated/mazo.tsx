@@ -26,6 +26,8 @@ import type { Tables } from "@/integrations/supabase/types";
 export const Route = createFileRoute("/_authenticated/mazo")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Mi mazo de becas — BecaMatch" },
       { name: "description", content: "Becas verificadas y vigentes ordenadas por compatibilidad con tu perfil." },
       { property: "og:title", content: "Mi mazo de becas — BecaMatch" },

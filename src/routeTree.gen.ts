@@ -19,10 +19,12 @@ import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminBecasRouteImport } from './routes/admin/becas'
 import { Route as AdminMarketingRouteImport } from './routes/admin/marketing'
 import { Route as AdminPostulantesRouteImport } from './routes/admin/postulantes'
 import { Route as AdminSolicitudesRouteImport } from './routes/admin/solicitudes'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
+import { Route as AdminVerificacionRouteImport } from './routes/admin/verificacion'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
 import { Route as WhatsappVincularRouteImport } from './routes/whatsapp.vincular'
 import { Route as AuthenticatedBecaIdRouteImport } from './routes/_authenticated/beca.$id'
@@ -78,6 +80,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminBecasRoute = AdminBecasRouteImport.update({
+  id: '/becas',
+  path: '/becas',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminMarketingRoute = AdminMarketingRouteImport.update({
   id: '/marketing',
   path: '/marketing',
@@ -96,6 +103,11 @@ const AdminSolicitudesRoute = AdminSolicitudesRouteImport.update({
 const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminVerificacionRoute = AdminVerificacionRouteImport.update({
+  id: '/verificacion',
+  path: '/verificacion',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminWhatsappRoute = AdminWhatsappRouteImport.update({
@@ -134,10 +146,12 @@ export interface FileRoutesByFullPath {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
+  '/admin/verificacion': typeof AdminVerificacionRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin/': typeof AdminIndexRoute
@@ -153,10 +167,12 @@ export interface FileRoutesByTo {
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
+  '/admin/verificacion': typeof AdminVerificacionRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin': typeof AdminIndexRoute
@@ -175,10 +191,12 @@ export interface FileRoutesById {
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
+  '/admin/verificacion': typeof AdminVerificacionRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin/': typeof AdminIndexRoute
@@ -197,10 +215,12 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/becas'
     | '/admin/marketing'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
+    | '/admin/verificacion'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
     | '/admin/'
@@ -216,10 +236,12 @@ export interface FileRouteTypes {
     | '/mazo'
     | '/mis-becas'
     | '/perfil'
+    | '/admin/becas'
     | '/admin/marketing'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
+    | '/admin/verificacion'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
     | '/admin'
@@ -237,10 +259,12 @@ export interface FileRouteTypes {
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
     | '/_authenticated/perfil'
+    | '/admin/becas'
     | '/admin/marketing'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
+    | '/admin/verificacion'
     | '/admin/whatsapp'
     | '/whatsapp/vincular'
     | '/admin/'
@@ -332,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/becas': {
+      id: '/admin/becas'
+      path: '/becas'
+      fullPath: '/admin/becas'
+      preLoaderRoute: typeof AdminBecasRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/marketing': {
       id: '/admin/marketing'
       path: '/marketing'
@@ -358,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/admin/usuarios'
       preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/verificacion': {
+      id: '/admin/verificacion'
+      path: '/verificacion'
+      fullPath: '/admin/verificacion'
+      preLoaderRoute: typeof AdminVerificacionRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/whatsapp': {
@@ -418,19 +456,23 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
+  AdminBecasRoute: typeof AdminBecasRoute
   AdminMarketingRoute: typeof AdminMarketingRoute
   AdminPostulantesRoute: typeof AdminPostulantesRoute
   AdminSolicitudesRoute: typeof AdminSolicitudesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
+  AdminVerificacionRoute: typeof AdminVerificacionRoute
   AdminWhatsappRoute: typeof AdminWhatsappRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminBecasRoute: AdminBecasRoute,
   AdminMarketingRoute: AdminMarketingRoute,
   AdminPostulantesRoute: AdminPostulantesRoute,
   AdminSolicitudesRoute: AdminSolicitudesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
+  AdminVerificacionRoute: AdminVerificacionRoute,
   AdminWhatsappRoute: AdminWhatsappRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

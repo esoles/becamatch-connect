@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useLocation,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
@@ -14,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { AccountMenu } from "@/components/account-menu";
 
 function NotFoundComponent() {
   return (
@@ -98,6 +100,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function Header() {
+  const pathname = useLocation({ select: (location) => location.pathname });
   const [signedIn, setSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
@@ -124,30 +127,30 @@ function Header() {
     });
     return () => data.subscription.unsubscribe();
   }, []);
-  const link = "rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground";
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return null;
+  const link = "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap";
   const active = { className: "bg-secondary text-foreground" };
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
+      <nav className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-xl font-bold text-primary">
           Beca<span className="text-accent">Match</span>
         </Link>
         <div className="flex items-center gap-1">
+          {signedIn ? <AccountMenu isAdmin={isAdmin} /> : <Link to="/auth" className={link} activeProps={active}>Ingresar</Link>}
+        </div>
+        {signedIn && <div className="order-last flex w-full items-center gap-1 overflow-x-auto sm:order-none sm:w-auto">
           {signedIn ? (
             <>
-              <Link to="/mazo" className={link} activeProps={active}>Mazo</Link>
+              <Link to="/mazo" className={link} activeProps={active}>Descubrir becas</Link>
               <Link to="/mis-becas" className={link} activeProps={active}>Mis becas</Link>
-              <Link to="/asistente" search={{ beca: undefined }} className={link} activeProps={active}>Asistente</Link>
-              <Link to="/perfil" className={link} activeProps={active}>Perfil</Link>
-              <button className={link} onClick={() => supabase.auth.signOut().then(() => (window.location.href = "/"))}>
-                Salir
-              </button>
+              <Link to="/asistente" search={{ beca: undefined }} className={link} activeProps={active}>Asistente IA</Link>
+              <Link to="/perfil" className={link} activeProps={active}>Mi perfil</Link>
             </>
           ) : (
             <Link to="/auth" className={link} activeProps={active}>Ingresar</Link>
           )}
-          <Link to="/admin" className={`${link} ${isAdmin ? "" : "text-xs"}`} activeProps={active}>Panel admin</Link>
-        </div>
+        </div>}
       </nav>
     </header>
   );

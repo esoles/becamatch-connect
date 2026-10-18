@@ -8,6 +8,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Crea tu perfil y descubre becas ordenadas por compatibilidad real con tus estudios, idiomas y promedio." },
       { property: "og:title", content: "BecaMatch — Becas compatibles con tu perfil" },
       { property: "og:description", content: "Crea tu perfil y descubre becas ordenadas por compatibilidad." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Landing,
