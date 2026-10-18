@@ -43,7 +43,9 @@ export async function loadInteractions(db: Admin) {
       all((a, b) =>
         db
           .from("web_agent_plans")
-          .select("id,conversation_id,plan,created_at")
+          .select(
+            "id,conversation_id,request_id,whatsapp_message_id,plan,plan_number,share_id,created_at",
+          )
           .order("created_at")
           .order("id")
           .range(a, b),
@@ -62,6 +64,17 @@ export async function loadInteractions(db: Admin) {
       all((a, b) => db.from("profiles").select("id,full_name").order("id").range(a, b)),
     ]);
   const names = new Map(profiles.map((p) => [p.id, p.full_name]));
+  const savedPlan = (p: (typeof plans)[number]) => ({
+    date: p.created_at,
+    plan: {
+      ...(p.plan as unknown as AgentPlan),
+      planNumber: p.plan_number ?? undefined,
+      shareId: p.share_id,
+      shareUrl: p.plan_number
+        ? `https://becamatch-connect.lovable.app/plan/${p.share_id}`
+        : undefined,
+    },
+  });
   const rows: InboxInteraction[] = requests.map((r) => ({
     key: `form:${r.id}`,
     id: r.id,
@@ -78,7 +91,7 @@ export async function loadInteractions(db: Admin) {
     analysis: r.ai_analysis,
     scholarshipIds: r.recommended_scholarship_ids,
     messages: [],
-    plans: [],
+    plans: plans.filter((p) => p.request_id === r.id).map(savedPlan),
   }));
   for (const c of conversations) {
     const transcript = messages
@@ -89,9 +102,7 @@ export async function loadInteractions(db: Admin) {
         direction: (m.message as unknown as UIMessage).role,
         message: m.message as unknown as UIMessage,
       }));
-    const savedPlans = plans
-      .filter((p) => p.conversation_id === c.id)
-      .map((p) => ({ date: p.created_at, plan: p.plan as unknown as AgentPlan }));
+    const savedPlans = plans.filter((p) => p.conversation_id === c.id).map(savedPlan);
     if (!transcript.length && !savedPlans.length) continue;
     rows.push({
       key: `web:${c.id}`,
@@ -132,7 +143,9 @@ export async function loadInteractions(db: Admin) {
         action: m.action,
         result: m.result,
       })),
-      plans: [],
+      plans: plans
+        .filter((p) => transcript.some((m) => m.id === p.whatsapp_message_id))
+        .map(savedPlan),
     });
   }
   return sortInteractions(rows);

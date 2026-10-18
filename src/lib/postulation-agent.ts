@@ -67,10 +67,15 @@ export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[],
           name: r.scholarship.name,
           entity: r.scholarship.entity,
           country: r.scholarship.country,
+          studyLevel: r.scholarship.study_level,
+          area: r.scholarship.area,
+          language: r.scholarship.language_code
+            ? `${r.scholarship.language_code} ${r.scholarship.language_level ?? ""}`.trim()
+            : null,
           deadline: r.scholarship.deadline,
           url: r.scholarship.official_url,
           coverage: r.scholarship.coverage,
-          score: r.compatibility_score,
+          score: r.compatibility_score as number | null,
           reasons: explain(r.components),
           requirements: r.scholarship.requirements,
           legacyDocuments: r.scholarship.documents,
@@ -96,5 +101,10 @@ export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[],
     ],
   };
 }
-export type AgentPlan = ReturnType<typeof makeAgentPlan>;
+export type AgentPlan = ReturnType<typeof makeAgentPlan> & {
+  planNumber?: string | undefined;
+  shareId?: string | undefined;
+  shareUrl?: string | undefined;
+  createdAt?: string | undefined;
+};
 export const AGENT_STORAGE_KEY = "becamatch:postulation-agent:v1";

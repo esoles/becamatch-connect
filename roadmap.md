@@ -1,10 +1,10 @@
 # Scholarship data expansion
 
 # Secure application plans
-- [ ] Reuse plan generation and persist sequential numbers, safe share content and source relationships.
-- [ ] Connect web form, agent and authorized WhatsApp plan links; preserve delivery limitations and follow-up stages.
-- [ ] Add a secure plan page with verified facts, missing-data notices and copying.
-- [ ] Test concurrent identifiers, share privacy, saved plan readback, stages and existing channel flows.
+- [x] Reuse plan generation and persist sequential numbers, safe share content and source relationships.
+- [x] Connect web form, agent and existing WhatsApp webhook plan replies; preserve delivery limitations and follow-up stages. WhatsApp delivery remains blocked by the real exchange noted below.
+- [x] Add a secure plan page with verified facts, missing-data notices and copying.
+- [x] Test concurrent identifiers, share privacy, saved plan readback, stage/audit database readback, real agent confirmation/restoration and existing channel rules. The catalog currently has no verified real opportunities; end-to-end plans explicitly request missing facts rather than use demos. Provider accepted both authorized form emails, not proof of delivery.
 
 # Unified applicants and multichannel follow-up
 - [x] Reuse existing sources and consolidate verified identities without losing channel histories.

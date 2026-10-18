@@ -27,6 +27,7 @@ import { Route as AdminSolicitudesRouteImport } from './routes/admin/solicitudes
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminVerificacionRouteImport } from './routes/admin/verificacion'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
+import { Route as PlanIdRouteImport } from './routes/plan.$id'
 import { Route as WhatsappVincularRouteImport } from './routes/whatsapp.vincular'
 import { Route as AuthenticatedBecaIdRouteImport } from './routes/_authenticated/beca.$id'
 import { Route as ApiPublicPostulationAgentRouteImport } from './routes/api/public/postulation-agent'
@@ -121,6 +122,11 @@ const AdminWhatsappRoute = AdminWhatsappRouteImport.update({
   path: '/whatsapp',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const PlanIdRoute = PlanIdRouteImport.update({
+  id: '/plan/$id',
+  path: '/plan/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WhatsappVincularRoute = WhatsappVincularRouteImport.update({
   id: '/whatsapp/vincular',
   path: '/whatsapp/vincular',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/verificacion': typeof AdminVerificacionRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
+  '/plan/$id': typeof PlanIdRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin/': typeof AdminIndexRoute
   '/beca/$id': typeof AuthenticatedBecaIdRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/verificacion': typeof AdminVerificacionRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
+  '/plan/$id': typeof PlanIdRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin': typeof AdminIndexRoute
   '/beca/$id': typeof AuthenticatedBecaIdRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/verificacion': typeof AdminVerificacionRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
+  '/plan/$id': typeof PlanIdRoute
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/beca/$id': typeof AuthenticatedBecaIdRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/admin/verificacion'
     | '/admin/whatsapp'
+    | '/plan/$id'
     | '/whatsapp/vincular'
     | '/admin/'
     | '/beca/$id'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/admin/verificacion'
     | '/admin/whatsapp'
+    | '/plan/$id'
     | '/whatsapp/vincular'
     | '/admin'
     | '/beca/$id'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/admin/verificacion'
     | '/admin/whatsapp'
+    | '/plan/$id'
     | '/whatsapp/vincular'
     | '/admin/'
     | '/_authenticated/beca/$id'
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   PostularRoute: typeof PostularRoute
+  PlanIdRoute: typeof PlanIdRoute
   WhatsappVincularRoute: typeof WhatsappVincularRoute
   ApiPublicPostulationAgentRoute: typeof ApiPublicPostulationAgentRoute
   ApiPublicWhatsappRoute: typeof ApiPublicWhatsappRoute
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWhatsappRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/plan/$id': {
+      id: '/plan/$id'
+      path: '/plan/$id'
+      fullPath: '/plan/$id'
+      preLoaderRoute: typeof PlanIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/whatsapp/vincular': {
       id: '/whatsapp/vincular'
       path: '/whatsapp/vincular'
@@ -508,6 +528,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   PostularRoute: PostularRoute,
+  PlanIdRoute: PlanIdRoute,
   WhatsappVincularRoute: WhatsappVincularRoute,
   ApiPublicPostulationAgentRoute: ApiPublicPostulationAgentRoute,
   ApiPublicWhatsappRoute: ApiPublicWhatsappRoute,
