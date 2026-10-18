@@ -1,5 +1,10 @@
 # Scholarship data expansion
 
+# Demo verification for testing
+- [ ] Enable all demo records for testing without changing provenance or official verification dates.
+- [ ] Allow administrators to toggle demo verification and label it explicitly as testing.
+- [ ] Verify persistent toggle changes and continued exclusion from real plans.
+
 # Account placement and manual verification
 - [x] Place the account menu immediately after Mi perfil.
 - [x] Add a role-protected verification switch with source confirmation; preserve fictional provenance instead of falsely marking demos verified.
