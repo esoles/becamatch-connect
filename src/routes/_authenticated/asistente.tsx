@@ -11,7 +11,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 export const Route = createFileRoute("/_authenticated/asistente")({
   validateSearch: (s: Record<string, unknown>) => ({
-    beca: typeof s.beca === "string" ? s.beca : undefined,
+    beca: typeof s["beca"] === "string" ? (s["beca"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -87,7 +87,7 @@ function AssistantPage() {
               <p className="font-semibold">{sch.name}</p>
               <p className="text-sm text-muted-foreground">{sch.entity} · {sch.country}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate({ to: "/asistente", search: {} })}>
+            <Button variant="outline" size="sm" onClick={() => navigate({ to: "/asistente" })}>
               Quitar contexto
             </Button>
           </div>
