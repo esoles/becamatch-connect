@@ -59,7 +59,8 @@ export async function handleIncoming(db: Admin, phone: string, body: string, ori
     const incoming = await db.from("whatsapp_messages").insert({ phone, direction: "entrante", body, user_id: userId, action }).select("id").single();
     if (incoming.error || !incoming.data) throw new Error("No se pudo guardar la solicitud del plan.");
     const catalog = await verifiedCatalog(db);
-    const chosen = findScholarship(catalog as Sch[], body) ?? catalog.find((s) => s.id === current?.id);
+    const match = findScholarship(catalog as Sch[], body);
+    const chosen = catalog.find((s) => s.id === (match?.id ?? current?.id));
     const profile = userId ? await db.from("profiles").select("study_level,area,countries,languages,gpa").eq("id", userId).maybeSingle() : null;
     if (profile?.error) throw new Error("No se pudo consultar el perfil.");
     const plan = await saveSharedPlan(db, planForSelection(chosen ? [chosen] : [], profile?.data as unknown as CompatProfile | null), { whatsappMessageId: incoming.data.id, userId });

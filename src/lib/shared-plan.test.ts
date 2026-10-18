@@ -21,5 +21,5 @@ describe("secure application plan", () => {
   it("reports exactly three days remaining", () => { expect(remainingDays("2026-10-21", "2026-10-18")).toBe(3); });
   it("does not fabricate documents when missing", () => { expect(selectedOpportunity({ ...scholarship, documentos_requeridos: [] }, null).orientation.documents).toEqual([]); });
   it("removes injected private fields when parsing shared content", () => { const safe = shareablePlan(makeAgentPlan(profile, [scholarship], "2026-10-18")); expect(sharedPlanSchema.parse({ ...safe, email: "private@example.org", conversation: "secret" })).toEqual(safe); });
-  it("rejects unsafe source URLs", () => { const safe = shareablePlan(makeAgentPlan(profile, [scholarship], "2026-10-18")); safe.opportunities[0].url = "javascript:alert(1)"; expect(sharedPlanSchema.safeParse(safe).success).toBe(false); });
+  it("rejects unsafe source URLs", () => { const safe = shareablePlan(makeAgentPlan(profile, [scholarship], "2026-10-18")); const opportunity = safe.opportunities[0]; if (!opportunity) throw new Error("Missing test opportunity"); opportunity.url = "javascript:alert(1)"; expect(sharedPlanSchema.safeParse(safe).success).toBe(false); });
 });

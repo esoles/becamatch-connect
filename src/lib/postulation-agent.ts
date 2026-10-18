@@ -100,6 +100,6 @@ export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[],
   };
 }
 export type AgentPlan = ReturnType<typeof makeAgentPlan> & {
-  planNumber?: string; shareId?: string; shareUrl?: string; createdAt?: string;
+  planNumber?: string | undefined; shareId?: string | undefined; shareUrl?: string | undefined; createdAt?: string | undefined;
 };
 export const AGENT_STORAGE_KEY = "becamatch:postulation-agent:v1";
