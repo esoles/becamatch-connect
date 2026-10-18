@@ -29,8 +29,10 @@ import {
   type AgentPlan,
 } from "@/lib/postulation-agent";
 import { generateAgentPlan, emailAgentPlan } from "@/lib/postulation-agent.functions";
+import { startAgentConversation, restoreAgentConversation } from "@/lib/agent-history.functions";
+import { supabase } from "@/integrations/supabase/client";
 
-type SavedConversation = { messages: UIMessage[]; plan: AgentPlan | null };
+type SavedConversation = { messages: UIMessage[]; plan: AgentPlan | null; conversationId: string; resumeToken: string };
 const initialMessage: UIMessage = {
   id: "postulation-welcome",
   role: "assistant",
@@ -44,23 +46,30 @@ const initialMessage: UIMessage = {
 
 export function PostulationAgent({ onBack }: { onBack: () => void }) {
   const [saved, setSaved] = useState<SavedConversation | null>(null);
+  const [failure, setFailure] = useState("");
+  const start = useServerFn(startAgentConversation);
+  const restore = useServerFn(restoreAgentConversation);
+  const boot = useRef<Promise<SavedConversation> | null>(null);
   useEffect(() => {
-    try {
+    if (!boot.current) boot.current = (async () => {
       const raw = localStorage.getItem(AGENT_STORAGE_KEY);
       const parsed = raw ? JSON.parse(raw) : null;
-      setSaved(
-        parsed && Array.isArray(parsed.messages)
-          ? parsed
-          : { messages: [initialMessage], plan: null },
-      );
-    } catch {
-      setSaved({ messages: [initialMessage], plan: null });
-    }
-  }, []);
+      if (parsed?.conversationId && parsed?.resumeToken) {
+        const credential = { conversationId: parsed.conversationId as string, resumeToken: parsed.resumeToken as string };
+        const history = await restore({ data: credential });
+        return { ...credential, messages: history.messages.length ? history.messages : [initialMessage], plan: history.plan };
+      }
+      const { data: session } = await supabase.auth.getSession();
+      const credential = await start({ data: { accessToken: session.session?.access_token } });
+      localStorage.setItem(AGENT_STORAGE_KEY, JSON.stringify(credential));
+      return { ...credential, messages: [initialMessage], plan: null };
+    })();
+    void boot.current.then(setSaved).catch((error: unknown) => setFailure(error instanceof Error ? error.message : "No se pudo recuperar la conversación."));
+  }, [start, restore]);
   return saved ? (
-    <AgentConversation initial={saved} onBack={onBack} />
+    <AgentConversation key={saved.conversationId} initial={saved} onBack={onBack} onReset={() => { localStorage.removeItem(AGENT_STORAGE_KEY); onBack(); }} />
   ) : (
-    <p className="p-8 text-muted-foreground">Cargando conversación…</p>
+    <p role={failure ? "alert" : undefined} className="p-8 text-muted-foreground">{failure || "Cargando conversación…"}</p>
   );
 }
 
@@ -86,9 +95,11 @@ function ProfileSummary({ profile }: { profile: AgentProfile }) {
 function AgentConversation({
   initial,
   onBack,
+  onReset,
 }: {
   initial: SavedConversation;
   onBack: () => void;
+  onReset: () => void;
 }) {
   const [text, setText] = useState("");
   const [plan, setPlan] = useState<AgentPlan | null>(initial.plan);
@@ -101,17 +112,20 @@ function AgentConversation({
   planRef.current = plan;
   const generate = useServerFn(generateAgentPlan);
   const sendEmail = useServerFn(emailAgentPlan);
-  const persist = (messages: UIMessage[], value: AgentPlan | null) => {
+  const persist = (_messages: UIMessage[], _value: AgentPlan | null) => {
     try {
-      localStorage.setItem(AGENT_STORAGE_KEY, JSON.stringify({ messages, plan: value }));
+      localStorage.setItem(AGENT_STORAGE_KEY, JSON.stringify({ conversationId: initial.conversationId, resumeToken: initial.resumeToken }));
     } catch {
       setProblem("No se pudo conservar la conversación en este navegador.");
     }
   };
   const { messages, sendMessage, setMessages, status, stop } = useChat({
-    id: "becamatch-postulation-agent",
+    id: initial.conversationId,
     messages: initial.messages,
-    transport: new DefaultChatTransport({ api: "/api/public/postulation-agent" }),
+    transport: new DefaultChatTransport({ api: "/api/public/postulation-agent", body: { conversationId: initial.conversationId, resumeToken: initial.resumeToken }, headers: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {};
+    } }),
     onFinish: ({ messages: completed }) => {
       persist(completed, planRef.current);
       textareaRef.current?.focus();
@@ -148,7 +162,7 @@ function AgentConversation({
     setBuilding(true);
     setProblem("");
     try {
-      setPlan(await generate({ data: { profile, confirmed: true } }));
+      setPlan(await generate({ data: { profile, confirmed: true, conversationId: initial.conversationId, resumeToken: initial.resumeToken } }));
     } catch (error) {
       setProblem(error instanceof Error ? error.message : "No se pudo preparar el plan.");
     } finally {
@@ -174,17 +188,12 @@ function AgentConversation({
         <Button
           variant="ghost"
           size="icon"
-          title="Borrar conversación"
-          aria-label="Borrar conversación"
+          title="Comenzar otra conversación"
+          aria-label="Comenzar otra conversación"
           disabled={busy}
           onClick={() => {
-            if (!window.confirm("¿Borrar la conversación guardada en este navegador?")) return;
-            localStorage.removeItem(AGENT_STORAGE_KEY);
-            setMessages([initialMessage]);
-            setPlan(null);
-            setProblem("");
-            setMailState("idle");
-            setEmail("");
+            if (!window.confirm("¿Comenzar otra conversación? El historial anterior se conservará para su atención.")) return;
+            onReset();
           }}
         >
           <Trash2 />
@@ -194,7 +203,7 @@ function AgentConversation({
         <GraduationCap className="size-8 text-primary" />
         <div>
           <h1 className="font-display text-2xl font-bold">Tu plan con BecaMatch</h1>
-          <p className="text-sm text-muted-foreground">Conversación guardada en este navegador.</p>
+          <p className="text-sm text-muted-foreground">Conversación guardada para su atención por BecaMatch.</p>
         </div>
       </div>
       <Conversation className="h-[480px] min-h-72">
