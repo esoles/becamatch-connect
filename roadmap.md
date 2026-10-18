@@ -1,5 +1,8 @@
 # Scholarship data expansion
 
+# Unified applicants and multichannel follow-up
+- [ ] Implement the unified applicant brief after receiving the missing text: uploaded document ends mid-sentence in Contactado, so remaining stages and requirements are unknown.
+
 # Central interaction inbox
 - [x] Persist web-agent messages and generated plans with secure anonymous resumption.
 - [x] Centralize forms, web-agent and WhatsApp in the existing admin section with filters, details and reliable related-record navigation.
