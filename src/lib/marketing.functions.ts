@@ -144,7 +144,7 @@ export const updateMarketingPost = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: { updated_at: string; status?: string; published_at?: string | null; content?: unknown } = {
+    const patch: { updated_at: string; status?: string; published_at?: string | null; content?: import("@/integrations/supabase/types").Json } = {
       updated_at: new Date().toISOString(),
     };
     if (data.status) {
