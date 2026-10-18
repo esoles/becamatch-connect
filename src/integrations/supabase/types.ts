@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      marketing_posts: {
+        Row: {
+          campaign: string
+          channel: string
+          content: Json
+          created_at: string
+          created_by: string
+          id: string
+          published_at: string | null
+          scholarship_id: string
+          status: string
+          updated_at: string
+          utm_url: string
+        }
+        Insert: {
+          campaign: string
+          channel?: string
+          content?: Json
+          created_at?: string
+          created_by: string
+          id?: string
+          published_at?: string | null
+          scholarship_id: string
+          status?: string
+          updated_at?: string
+          utm_url: string
+        }
+        Update: {
+          campaign?: string
+          channel?: string
+          content?: Json
+          created_at?: string
+          created_by?: string
+          id?: string
+          published_at?: string | null
+          scholarship_id?: string
+          status?: string
+          updated_at?: string
+          utm_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_posts_scholarship_id_fkey"
+            columns: ["scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       postulation_requests: {
         Row: {
           ai_analysis: Json | null
