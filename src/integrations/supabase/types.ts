@@ -184,61 +184,88 @@ export type Database = {
         Row: {
           archived: boolean
           area: string | null
+          aviso_datos: string | null
           country: string
           coverage: string | null
           created_at: string
           deadline: string
+          documentos_requeridos: Json
           documents: string | null
           entity: string
           es_demo: boolean
+          estado_datos: string
+          fuente_requisitos: string | null
           id: string
           language_code: string | null
           language_level: string | null
           min_gpa: number | null
           name: string
           official_url: string | null
+          preguntas_frecuentes: Json
+          proceso_postulacion: Json
           requirements: string | null
+          requisitos_detallados: Json
+          restricciones: Json
           study_level: string | null
+          ultima_verificacion: string | null
           verified: boolean
         }
         Insert: {
           archived?: boolean
           area?: string | null
+          aviso_datos?: string | null
           country: string
           coverage?: string | null
           created_at?: string
           deadline: string
+          documentos_requeridos?: Json
           documents?: string | null
           entity: string
           es_demo?: boolean
+          estado_datos?: string
+          fuente_requisitos?: string | null
           id?: string
           language_code?: string | null
           language_level?: string | null
           min_gpa?: number | null
           name: string
           official_url?: string | null
+          preguntas_frecuentes?: Json
+          proceso_postulacion?: Json
           requirements?: string | null
+          requisitos_detallados?: Json
+          restricciones?: Json
           study_level?: string | null
+          ultima_verificacion?: string | null
           verified?: boolean
         }
         Update: {
           archived?: boolean
           area?: string | null
+          aviso_datos?: string | null
           country?: string
           coverage?: string | null
           created_at?: string
           deadline?: string
+          documentos_requeridos?: Json
           documents?: string | null
           entity?: string
           es_demo?: boolean
+          estado_datos?: string
+          fuente_requisitos?: string | null
           id?: string
           language_code?: string | null
           language_level?: string | null
           min_gpa?: number | null
           name?: string
           official_url?: string | null
+          preguntas_frecuentes?: Json
+          proceso_postulacion?: Json
           requirements?: string | null
+          requisitos_detallados?: Json
+          restricciones?: Json
           study_level?: string | null
+          ultima_verificacion?: string | null
           verified?: boolean
         }
         Relationships: []
