@@ -3,7 +3,7 @@
 # Account placement and manual verification
 - [x] Place the account menu immediately after Mi perfil.
 - [x] Add a role-protected verification switch with source confirmation; preserve fictional provenance instead of falsely marking demos verified.
-- [ ] Test verification rules and signed-in menu/admin controls.
+- [x] Test verification rules (22 passing tests) and signed-in menu/admin controls; all 12 current scholarships are fictional demos and their verification switches are correctly disabled. Real-source verification persistence awaits an actual source-backed scholarship.
 
 # Secure application plans
 - [x] Reuse plan generation and persist sequential numbers, safe share content and source relationships.

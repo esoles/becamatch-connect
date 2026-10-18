@@ -137,14 +137,14 @@ function Header() {
           Beca<span className="text-accent">Match</span>
         </Link>
         {!signedIn && <Link to="/auth" className={link} activeProps={active}>Ingresar</Link>}
-        {signedIn && <div className="order-last flex w-full items-center justify-end gap-1 sm:order-none sm:w-auto">
-            <div className="flex min-w-0 items-center gap-1 overflow-x-auto">
+        {signedIn && <div className="order-last flex w-full flex-wrap items-center justify-end gap-1 sm:order-none sm:w-auto">
               <Link to="/mazo" className={link} activeProps={active}>Descubrir becas</Link>
               <Link to="/mis-becas" className={link} activeProps={active}>Mis becas</Link>
               <Link to="/asistente" search={{ beca: undefined }} className={link} activeProps={active}>Asistente IA</Link>
-              <Link to="/perfil" className={link} activeProps={active}>Mi perfil</Link>
-            </div>
-            <div className="shrink-0"><AccountMenu isAdmin={isAdmin} /></div>
+              <div className="flex shrink-0 items-center gap-1">
+                <Link to="/perfil" className={link} activeProps={active}>Mi perfil</Link>
+                <AccountMenu isAdmin={isAdmin} />
+              </div>
         </div>}
       </nav>
     </header>
