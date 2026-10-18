@@ -1,7 +1,10 @@
 # Scholarship data expansion
 
 # Unified applicants and multichannel follow-up
-- [ ] Implement the unified applicant brief after receiving the missing text: uploaded document ends mid-sentence in Contactado, so remaining stages and requirements are unknown.
+- [ ] Reuse existing sources and consolidate verified identities without losing channel histories.
+- [ ] Persist manual calls, stages, next actions, dates, assignments and reviewed identity links with admin-only access and audit.
+- [ ] Add explained deterministic priority, timestamp-based unanswered alerts, filters, sorting and person details.
+- [ ] Verify saved follow-up readback, identity rules, alerts, permissions and mobile layout; report unavailable social channels.
 
 # Central interaction inbox
 - [x] Persist web-agent messages and generated plans with secure anonymous resumption.
