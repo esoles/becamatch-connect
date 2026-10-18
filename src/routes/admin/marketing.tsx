@@ -50,6 +50,10 @@ export const Route = createFileRoute("/admin/marketing")({
     meta: [
       { title: "Marketing — BecaMatch" },
       { name: "description", content: "Generación y seguimiento de publicaciones de becas." },
+      { property: "og:title", content: "Marketing — BecaMatch" },
+      { property: "og:description", content: "Generación y seguimiento de publicaciones de becas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MarketingPage,
