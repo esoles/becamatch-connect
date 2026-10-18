@@ -38,6 +38,16 @@ function destination(): "/admin" | "/whatsapp/vincular" | "/perfil" {
   return "/perfil";
 }
 
+// Admin sign-in is only for accounts with the admin role; students get a clear message instead of a bounce.
+async function resolveAdminDestination(): Promise<"/admin" | "/perfil"> {
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) return "/perfil";
+  const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" });
+  if (isAdmin) return "/admin";
+  toast.error("Esta cuenta es de estudiante y no tiene acceso al panel administrativo.");
+  return "/perfil";
+}
+
 function AuthPage() {
   const { mode, next } = Route.useSearch();
   const [isLogin, setIsLogin] = useState(mode === "login" || next === "admin");
