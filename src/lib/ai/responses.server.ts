@@ -46,6 +46,15 @@ export function createResponsesCall(
   return {
     result,
     response: (originalMessages: UIMessage[]) =>
-      withLovableAiGatewayRunIdHeader(result.toUIMessageStreamResponse({ originalMessages, sendReasoning: true, onFinish: () => {}, onError: (error) => error instanceof Error ? error.message : "No se pudo completar la respuesta." }), runIdFetch),
+      withLovableAiGatewayRunIdHeader(
+        result.toUIMessageStreamResponse({
+          originalMessages,
+          sendReasoning: true,
+          onFinish: () => {},
+          onError: (error) =>
+            error instanceof Error ? error.message : "No se pudo completar la respuesta.",
+        }),
+        runIdFetch,
+      ),
   };
 }
