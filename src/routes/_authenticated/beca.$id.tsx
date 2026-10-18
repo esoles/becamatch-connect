@@ -99,6 +99,7 @@ function Detail() {
       <Link to="/mazo" className="text-sm text-muted-foreground hover:text-foreground">← Volver al mazo</Link>
       <div className="mt-4 flex flex-wrap gap-1.5">
         {sch.es_demo && <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground">Datos de demostración</span>}
+        {sch.verified && (sch.es_demo || sch.estado_datos === "propuesta_ficticia_no_verificada") && <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold">Verificada para pruebas</span>}
         {current && <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold">{current === "guardada" ? "Guardada" : "Descartada"}</span>}
       </div>
       <h1 className="mt-2 text-3xl font-bold leading-tight">{sch.name}</h1>

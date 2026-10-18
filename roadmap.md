@@ -1,9 +1,14 @@
 # Scholarship data expansion
 
+# Demo verification for testing
+- [x] Enable all 12 demo records for testing without changing provenance or official verification dates.
+- [x] Allow administrators to toggle demo verification and label it explicitly as testing.
+- [x] Verify toggle off/on persistence through reload, all 12 enabled switches, labeled student detail, and exclusion from real plans; 26 tests passed.
+
 # Account placement and manual verification
 - [x] Place the account menu immediately after Mi perfil.
 - [x] Add a role-protected verification switch with source confirmation; preserve fictional provenance instead of falsely marking demos verified.
-- [x] Test verification rules (22 passing tests) and signed-in menu/admin controls; all 12 current scholarships are fictional demos and their verification switches are correctly disabled. Real-source verification persistence awaits an actual source-backed scholarship.
+- [x] Test verification rules and signed-in menu/admin controls; demo switches now support explicitly labeled testing. Real-source verification persistence awaits an actual source-backed scholarship.
 
 # Secure application plans
 - [x] Reuse plan generation and persist sequential numbers, safe share content and source relationships.
