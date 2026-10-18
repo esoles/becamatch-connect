@@ -106,6 +106,13 @@
       "when": 1792315227615,
       "tag": "0014_record_generated_plan_followup",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792341174357,
+      "tag": "0015_allow_submitted_applicant_stage",
+      "breakpoints": true
     }
   ]
 }

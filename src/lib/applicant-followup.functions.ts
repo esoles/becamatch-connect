@@ -72,7 +72,7 @@ export const saveApplicantFollowup = createServerFn({ method: "POST" })
     z
       .object({
         personKey: key,
-        stage: z.enum(["nuevo", "contactado", "preparando", "seguimiento", "ganado", "perdido"]),
+        stage: z.enum(["nuevo", "contactado", "preparando", "postulado", "seguimiento", "ganado", "perdido"]),
         nextAction: z.string().max(500),
         followupAt: z.string().datetime().nullable(),
         assignedTo: z.string().uuid().nullable(),

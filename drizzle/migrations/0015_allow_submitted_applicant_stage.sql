@@ -1,0 +1,2 @@
+ALTER TABLE public.applicant_followups DROP CONSTRAINT applicant_followups_stage_check;
+ALTER TABLE public.applicant_followups ADD CONSTRAINT applicant_followups_stage_check CHECK (stage IN ('nuevo','contactado','preparando','postulado','seguimiento','ganado','perdido'));
