@@ -1,7 +1,7 @@
 # Scholarship data expansion
 
 # Submitted application test case
-- [ ] Change Ana test case to Ganado with explicit fictional objective, add second seguimiento test case, and verify newest-first admin ordering.
+- [ ] Keep Ana test case Postulado, add two further cases (Ganado with explicit fictional objective and Postulación en seguimiento), and verify newest-first admin ordering.
 - [x] Add Postulado to existing administrative stages and retain deterministic priority; 15 tests passed.
 - [x] Persist an explicitly fictional Ana test case with next action and audit; verified admin row, detail and reload at 30/100.
 
