@@ -16,7 +16,8 @@ export const askAssistant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data, context }) => {
-    let sch: Record<string, unknown> | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let sch: any = null;
     if (data.scholarshipId) {
       const { data: row } = await context.supabase
         .from("scholarships")
