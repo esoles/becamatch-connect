@@ -64,8 +64,14 @@ export function createResponsesCall(
       const failure = upstreamFailure as Response | null;
       if (failure) {
         await response.body?.cancel();
-        const body = await failure.json().catch(() => null) as { message?: string; error?: { message?: string } } | null;
-        return new Response(body?.message ?? body?.error?.message ?? "Le service de IA no está disponible.", { status: failure.status });
+        const body = (await failure.json().catch(() => null)) as {
+          message?: string;
+          error?: { message?: string };
+        } | null;
+        return new Response(
+          body?.message ?? body?.error?.message ?? "Le service de IA no está disponible.",
+          { status: failure.status },
+        );
       }
       return response;
     },

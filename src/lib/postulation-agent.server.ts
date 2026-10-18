@@ -29,4 +29,3 @@ export async function readPlan(profile: AgentProfile) {
   if (error) throw new Error("No se pudo consultar el catálogo de becas.");
   return makeAgentPlan(profile, data ?? [], new Date().toISOString().slice(0, 10));
 }
-

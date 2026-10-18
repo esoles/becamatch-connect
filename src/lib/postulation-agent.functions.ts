@@ -3,7 +3,6 @@ import { z } from "zod";
 import { agentProfileSchema } from "./postulation-agent";
 import { readPlan } from "./postulation-agent.server";
 
-
 export const generateAgentPlan = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({ profile: agentProfileSchema, confirmed: z.literal(true) }).parse(input),
