@@ -6,6 +6,7 @@ import { askAssistant } from "@/lib/assistant.functions";
 import { scholarshipsQuery } from "@/lib/profile";
 import { Button } from "@/components/ui/button";
 import { QUICK_QUESTIONS } from "@/lib/assistant";
+import { orientationData } from "@/lib/scholarship-orientation";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/_authenticated/asistente")({
       { name: "description", content: "Pregunta al asistente sobre requisitos, cobertura, fechas y documentos de tu beca." },
       { property: "og:title", content: "Asistente — BecaMatch" },
       { property: "og:description", content: "Orientación sobre tu beca con datos reales." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AssistantPage,
@@ -74,7 +77,7 @@ function AssistantPage() {
     <main className="mx-auto flex max-w-2xl flex-col px-4 py-8">
       <h1 className="text-2xl font-bold">Asistente de orientación</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Responde con los datos reales de la beca seleccionada. Si un dato no está registrado, te dirá dónde consultarlo.
+        {sch ? orientationData(sch).warning : "Orientación sobre becas registradas en BecaMatch."}
       </p>
 
       <section className="mt-4 rounded-2xl border border-border bg-card p-4">
@@ -106,14 +109,14 @@ function AssistantPage() {
       {sch && (
         <div className="mt-3 flex flex-wrap gap-2">
           {QUICK_QUESTIONS.map((x) => (
-            <button
+            <Button variant="secondary" size="sm"
               key={x}
               onClick={() => send(x)}
               disabled={busy}
               className="rounded-full bg-secondary px-3 py-1 text-xs font-medium disabled:opacity-50"
             >
               {x}
-            </button>
+            </Button>
           ))}
         </div>
       )}

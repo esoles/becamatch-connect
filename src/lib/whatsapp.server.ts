@@ -1,16 +1,13 @@
 // WhatsApp bot (server-only). Answers only from stored scholarship data, reusing the
 // shared assistant logic (assistant.server.ts) and the deterministic compatibility rules.
-import { answer } from "./assistant";
+import { withOrientationWarning } from "./scholarship-orientation";
+import type { ScholarshipFacts } from "./assistant.server";
 import { fmtDate } from "./profile";
 import { buildSystemPrompt, callAssistantAi } from "./assistant.server";
 import { buildDeck, type CompatProfile } from "./compatibility";
 
 type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
-type Sch = {
-  id: string; name: string; entity: string; country: string; deadline: string; area: string | null;
-  study_level: string | null; coverage: string | null; requirements: string | null; documents: string | null;
-  official_url: string | null; min_gpa: number | null; language_code: string | null; language_level: string | null;
-};
+type Sch = ScholarshipFacts & { id: string };
 
 export const ASK = "¿Deseas GUARDAR o DESCARTAR esta beca?";
 const norm = (t: string) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
@@ -33,7 +30,7 @@ export function findScholarship(list: Sch[], text: string): Sch | null {
 }
 
 export function summary(s: Sch) {
-  return `${s.name} (${s.entity}, ${s.country}): cierra el ${fmtDate(s.deadline)}; cobertura: ${s.coverage?.trim() || "no registrada"}.`;
+  return withOrientationWarning(`${s.name} (${s.entity}, ${s.country}): cierra el ${fmtDate(s.deadline)}; cobertura: ${s.coverage?.trim() || "no registrada"}.`, s);
 }
 
 function newToken() {
@@ -135,9 +132,9 @@ export async function handleIncoming(db: Admin, phone: string, body: string, ori
       await db.from("whatsapp_sessions").update({ current_scholarship_id: found.id, updated_at: new Date().toISOString() }).eq("phone", phone);
       reply = `${summary(found)}\n${ASK}`;
     } else if (current) {
-      const a = answer(current, body);
-      action = "pregunta"; sid = current.id; result = a.known ? "dato_registrado" : "no_registrado";
-      reply = `${a.text}\n${ASK}`;
+      const ai = await callAssistantAi(buildSystemPrompt({ scholarship: current, channel: "whatsapp" }), [{ role: "user", content: body }]);
+      action = "pregunta"; sid = current.id; result = ai.ok ? "ia" : "error_ia";
+      reply = withOrientationWarning(ai.ok ? `${ai.reply}\n${ASK}` : "No pude consultar el asistente ahora. Revisa la ficha en BecaMatch.", current);
     } else {
       // Free-form orientation question: same AI and rules as the web assistant.
       action = "pregunta"; result = "ia";

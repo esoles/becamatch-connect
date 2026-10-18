@@ -29,6 +29,10 @@ export const Route = createFileRoute("/admin/solicitudes")({
     meta: [
       { title: "Solicitudes de postulación — BecaMatch" },
       { name: "description", content: "Solicitudes recibidas desde el formulario público de postulación." },
+      { property: "og:title", content: "Solicitudes de postulación — BecaMatch" },
+      { property: "og:description", content: "Solicitudes recibidas desde el formulario público de postulación." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: SolicitudesPage,

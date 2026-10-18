@@ -64,6 +64,13 @@
       "when": 1792292701724,
       "tag": "0008_create_marketing_posts",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792296312115,
+      "tag": "0009_expand_scholarship_orientation_data",
+      "breakpoints": true
     }
   ]
 }

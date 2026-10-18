@@ -27,6 +27,10 @@ export const Route = createFileRoute("/admin/postulantes")({
     meta: [
       { title: "Postulantes — BecaMatch" },
       { name: "description", content: "Seguimiento de postulantes registrados en BecaMatch." },
+      { property: "og:title", content: "Postulantes — BecaMatch" },
+      { property: "og:description", content: "Seguimiento de postulantes registrados en BecaMatch." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: PostulantesPage,
