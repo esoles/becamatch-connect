@@ -49,7 +49,7 @@ export type Database = {
       }
       applicant_followup_audit: {
         Row: {
-          actor_id: string
+          actor_id: string | null
           after_data: Json
           before_data: Json | null
           created_at: string
@@ -58,7 +58,7 @@ export type Database = {
           record_type: string
         }
         Insert: {
-          actor_id: string
+          actor_id?: string | null
           after_data: Json
           before_data?: Json | null
           created_at?: string
@@ -67,7 +67,7 @@ export type Database = {
           record_type: string
         }
         Update: {
-          actor_id?: string
+          actor_id?: string | null
           after_data?: Json
           before_data?: Json | null
           created_at?: string
@@ -87,7 +87,7 @@ export type Database = {
           response_resolved_at: string | null
           stage: string
           updated_at: string
-          updated_by: string
+          updated_by: string | null
         }
         Insert: {
           assigned_to?: string | null
@@ -98,7 +98,7 @@ export type Database = {
           response_resolved_at?: string | null
           stage?: string
           updated_at?: string
-          updated_by: string
+          updated_by?: string | null
         }
         Update: {
           assigned_to?: string | null
@@ -109,7 +109,7 @@ export type Database = {
           response_resolved_at?: string | null
           stage?: string
           updated_at?: string
-          updated_by?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
