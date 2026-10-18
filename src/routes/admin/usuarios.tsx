@@ -14,6 +14,8 @@ export const Route = createFileRoute("/admin/usuarios")({
       { name: "description", content: "Crear cuentas de administrador." },
       { property: "og:title", content: "Administradores — Panel BecaMatch" },
       { property: "og:description", content: "Crear cuentas de administrador." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Usuarios,

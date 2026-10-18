@@ -17,8 +17,9 @@ export const Route = createFileRoute("/admin/becas")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => {
-    const { id } = Route.useSearch();
-    return <AdminScholarships selectedId={id} />;
-  },
+  component: BecasPage,
 });
+function BecasPage() {
+  const { id } = Route.useSearch();
+  return <AdminScholarships selectedId={id} />;
+}

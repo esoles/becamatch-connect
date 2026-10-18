@@ -17,8 +17,9 @@ export const Route = createFileRoute("/admin/verificacion")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => {
-    const { id } = Route.useSearch();
-    return <AdminScholarships verificationOnly selectedId={id} />;
-  },
+  component: VerificacionPage,
 });
+function VerificacionPage() {
+  const { id } = Route.useSearch();
+  return <AdminScholarships verificationOnly selectedId={id} />;
+}

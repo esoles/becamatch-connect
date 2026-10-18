@@ -10,6 +10,8 @@ export const Route = createFileRoute("/admin/whatsapp")({
       { name: "description", content: "Historial de conversaciones de WhatsApp por número." },
       { property: "og:title", content: "WhatsApp — Panel BecaMatch" },
       { property: "og:description", content: "Historial de conversaciones de WhatsApp." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: WhatsappHistory,
