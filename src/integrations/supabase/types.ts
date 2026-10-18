@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      postulation_requests: {
+        Row: {
+          ai_analysis: Json | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          recommended_scholarship_ids: string[]
+          request_text: string
+          status: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          recommended_scholarship_ids?: string[]
+          request_text: string
+          status?: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          recommended_scholarship_ids?: string[]
+          request_text?: string
+          status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string
