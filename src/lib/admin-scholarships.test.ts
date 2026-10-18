@@ -44,8 +44,14 @@ describe("administrative scholarship provenance", () => {
   it("turns verification off without inventing a verification date", () => {
     expect(verificationUpdate(row, false, undefined, undefined, "2026-10-18")).toEqual({ verified: false, estado_datos: "pendiente_verificacion", ultima_verificacion: null });
   });
-  it("rejects verifying demonstration records even with manual confirmation", () => {
-    expect(() => verificationUpdate({ ...row, es_demo: true }, true, "https://example.org", true, "2026-10-18")).toThrow();
+  it("enables demo verification for testing without changing provenance or inventing a source check", () => {
+    expect(verificationUpdate({ ...row, es_demo: true }, true, undefined, undefined, "2026-10-18")).toEqual({ verified: true });
+  });
+  it("disables demo verification for testing without changing original facts", () => {
+    expect(verificationUpdate({ ...row, es_demo: true }, false, undefined, undefined, "2026-10-18")).toEqual({ verified: false });
+  });
+  it("keeps test-enabled demos out of real verification totals", () => {
+    expect(summaryMetrics([{ ...row, es_demo: true, verified: true }], "2026-10-18").verified).toBe(0);
   });
   it("does not count demonstration records as real verified opportunities", () => {
     expect(summaryMetrics([{ ...row, es_demo: true }, row], "2026-10-18")).toEqual({

@@ -183,7 +183,7 @@ function Card({
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
           {s.es_demo && <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[11px] font-semibold text-accent-foreground">Demo</span>}
-          {s.verified && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">Verificada</span>}
+          {s.verified && <span className="rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">{s.es_demo || s.estado_datos === "propuesta_ficticia_no_verificada" ? "Verificada para pruebas" : "Verificada"}</span>}
         </div>
         <div className={`flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-full ${high ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
           <span className="font-display text-lg font-bold leading-none">{r.compatibility_score}</span>

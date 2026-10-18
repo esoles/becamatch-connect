@@ -7,6 +7,7 @@ import {
   verificationLabel,
   expiryLabel,
   canVerifyScholarship,
+  isDemoScholarship,
   type AdminScholarship,
 } from "@/lib/admin-scholarships";
 import { saveAdminScholarship, verifyAdminScholarship } from "@/lib/admin-scholarships.functions";
@@ -64,6 +65,7 @@ export function AdminScholarships({
           (filter === "real" && !s.es_demo) ||
           (filter === "demo" && s.es_demo) ||
           (filter === "verified" && verificationLabel(s) === "Verificada") ||
+          (filter === "test_verified" && isDemoScholarship(s) && s.verified) ||
           (filter === "pending" && verificationLabel(s) === "Pendiente de verificación") ||
           (filter === "expiring" &&
             expiryLabel(s.deadline, today, s.archived) === "Próxima a vencer") ||
@@ -120,6 +122,7 @@ export function AdminScholarships({
               ["real", "Convocatorias reales"],
               ["demo", "Datos de demostración"],
               ["verified", "Verificadas"],
+              ["test_verified", "Verificadas para pruebas"],
               ["pending", "Pendientes de verificación"],
               ["expiring", "Próximas a vencer"],
               ["expired", "Vencidas"],
@@ -191,12 +194,12 @@ export function AdminScholarships({
                   <div className="flex items-center gap-2">
                     <Switch
                       aria-label={`Verificación de ${s.name}`}
-                      checked={verificationLabel(s) === "Verificada"}
-                      disabled={busy || !canVerifyScholarship(s)}
-                      title={s.es_demo || s.estado_datos === "propuesta_ficticia_no_verificada" ? "Datos ficticios: no se pueden verificar como reales" : !s.official_url ? "Se requiere un enlace oficial" : "Verificación manual"}
+                      checked={isDemoScholarship(s) ? s.verified : verificationLabel(s) === "Verificada"}
+                      disabled={busy || (!isDemoScholarship(s) && !canVerifyScholarship(s))}
+                      title={isDemoScholarship(s) ? "Verificación para pruebas; no es una convocatoria real" : !s.official_url ? "Se requiere un enlace oficial" : "Verificación manual"}
                       onCheckedChange={async (value) => {
                         setError("");
-                        if (value) {
+                        if (value && !isDemoScholarship(s)) {
                           setVerifying(s);
                           setSource(s.fuente_requisitos || s.official_url || "");
                           setChecked(false);
@@ -204,9 +207,11 @@ export function AdminScholarships({
                         }
                         setBusy(true);
                         try {
-                          await verify({ data: { id: s.id, verified: false } });
+                          await verify({ data: { id: s.id, verified: value } });
                           await refresh();
-                          setNotice("La beca vuelve a estar pendiente de verificación.");
+                          setNotice(isDemoScholarship(s)
+                            ? value ? "Verificación para pruebas activada. Sigue siendo una beca ficticia." : "Verificación para pruebas desactivada."
+                            : "La beca vuelve a estar pendiente de verificación.");
                         } catch (err) {
                           setNotice("");
                           setError(err instanceof Error ? err.message : "No se pudo cambiar la verificación.");

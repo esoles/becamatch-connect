@@ -1,10 +1,13 @@
 import type { Database } from "@/integrations/supabase/types";
 export type AdminScholarship = Database["public"]["Tables"]["scholarships"]["Row"];
+export function isDemoScholarship(s: Pick<AdminScholarship, "es_demo" | "estado_datos">) {
+  return s.es_demo || s.estado_datos === "propuesta_ficticia_no_verificada";
+}
 export function verificationLabel(
   s: Pick<AdminScholarship, "es_demo" | "verified" | "estado_datos">,
 ) {
-  if (s.es_demo || s.estado_datos === "propuesta_ficticia_no_verificada")
-    return "Datos de demostración";
+  if (isDemoScholarship(s))
+    return s.verified ? "Verificada para pruebas · Datos de demostración" : "Datos de demostración";
   return s.verified && s.estado_datos === "verificada" ? "Verificada" : "Pendiente de verificación";
 }
 export function expiryLabel(deadline: string, today: string, archived = false) {
@@ -37,8 +40,7 @@ export function verificationUpdate(
   checked: boolean | undefined,
   today: string,
 ) {
-  if (scholarship.es_demo || scholarship.estado_datos === "propuesta_ficticia_no_verificada")
-    throw new Error("Los ejemplos ficticios deben conservar la etiqueta Datos de demostración.");
+  if (isDemoScholarship(scholarship)) return { verified };
   if (!verified)
     return { verified: false, estado_datos: "pendiente_verificacion", ultima_verificacion: null };
   if (!canVerifyScholarship(scholarship) || !checked || !source || !/^https?:\/\//.test(source))
