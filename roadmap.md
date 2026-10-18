@@ -1,5 +1,11 @@
 # Scholarship data expansion
 
+# Secure application plans
+- [ ] Reuse plan generation and persist sequential numbers, safe share content and source relationships.
+- [ ] Connect web form, agent and authorized WhatsApp plan links; preserve delivery limitations and follow-up stages.
+- [ ] Add a secure plan page with verified facts, missing-data notices and copying.
+- [ ] Test concurrent identifiers, share privacy, saved plan readback, stages and existing channel flows.
+
 # Unified applicants and multichannel follow-up
 - [x] Reuse existing sources and consolidate verified identities without losing channel histories.
 - [x] Persist manual calls, stages, next actions, dates, assignments and reviewed identity links with admin-only access and audit; keep identities with existing independent follow-up separate to preserve their decisions.
