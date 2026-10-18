@@ -44,7 +44,7 @@ export const listInteractions = createServerFn({ method: "GET" }).middleware([re
     if (!first || !last) continue;
     rows.push({ key: `wa:${first.id}`, id: first.id, channel: "WhatsApp", title: (userId ? names.get(userId) : null) || `Contacto ${first.id.slice(0,8)}`, userId, phone, lastActivity: last.created_at, preview: last.body.slice(0,160), status: "registrada", messages: transcript.map((m) => ({ id: m.id,date: m.created_at,direction: m.direction,body: m.body,action: m.action,result: m.result })), plans: [] });
   }
-  return sortInteractions(rows);
+  return JSON.stringify(sortInteractions(rows));
 });
 
 export const updateInteractionAttention = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])

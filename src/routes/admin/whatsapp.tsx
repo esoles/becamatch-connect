@@ -13,7 +13,7 @@ import { Tool, ToolHeader, ToolContent, ToolInput, ToolOutput } from "@/componen
 import { listInteractions, updateInteractionAttention } from "@/lib/interaction-inbox.functions";
 import { attentionLabels, filterInteractions, relatedInteractions, type InboxInteraction, type InteractionChannel } from "@/lib/interaction-inbox";
 
-const inboxQuery = queryOptions({ queryKey: ["admin", "interaction-inbox"], queryFn: () => listInteractions() });
+const inboxQuery = queryOptions({ queryKey: ["admin", "interaction-inbox"], queryFn: async () => JSON.parse(await listInteractions()) as InboxInteraction[] });
 const date = (iso: string) => new Date(iso).toLocaleString("es-PE", { timeZone: "America/Lima", dateStyle: "short", timeStyle: "short" });
 const icons = { Formulario: ClipboardList, "Agente web": MessagesSquare, WhatsApp: MessageCircle };
 export const Route = createFileRoute("/admin/whatsapp")({

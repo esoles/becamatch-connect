@@ -56,7 +56,7 @@ export function PostulationAgent({ onBack }: { onBack: () => void }) {
       const parsed = raw ? JSON.parse(raw) : null;
       if (parsed?.conversationId && parsed?.resumeToken) {
         const credential = { conversationId: parsed.conversationId as string, resumeToken: parsed.resumeToken as string };
-        const history = await restore({ data: credential });
+        const history = JSON.parse(await restore({ data: credential })) as { messages: UIMessage[]; plan: AgentPlan | null };
         return { ...credential, messages: history.messages.length ? history.messages : [initialMessage], plan: history.plan };
       }
       const { data: session } = await supabase.auth.getSession();
@@ -119,7 +119,7 @@ function AgentConversation({
       setProblem("No se pudo conservar la conversación en este navegador.");
     }
   };
-  const { messages, sendMessage, setMessages, status, stop } = useChat({
+  const { messages, sendMessage, status, stop } = useChat({
     id: initial.conversationId,
     messages: initial.messages,
     transport: new DefaultChatTransport({ api: "/api/public/postulation-agent", body: { conversationId: initial.conversationId, resumeToken: initial.resumeToken }, headers: async () => {

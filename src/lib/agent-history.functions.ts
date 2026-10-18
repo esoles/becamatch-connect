@@ -20,5 +20,5 @@ export const restoreAgentConversation = createServerFn({ method: "POST" })
       db.from("web_agent_plans").select("plan").eq("conversation_id", data.conversationId).order("created_at", { ascending: false }).limit(1),
     ]);
     if (messages.error || plans.error) throw new Error("No se pudo recuperar la conversación.");
-    return { messages: (messages.data ?? []).map((r) => r.message as unknown as UIMessage), plan: (plans.data?.[0]?.plan ?? null) as unknown as AgentPlan | null };
+    return JSON.stringify({ messages: (messages.data ?? []).map((r) => r.message as unknown as UIMessage), plan: (plans.data?.[0]?.plan ?? null) as unknown as AgentPlan | null });
   });
