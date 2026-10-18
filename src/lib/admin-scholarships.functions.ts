@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { canVerifyScholarship } from "./admin-scholarships";
+import { verificationUpdate } from "./admin-scholarships";
 
 const fields = z.object({
   name: z.string().trim().min(2).max(240),
@@ -77,11 +77,13 @@ export const verifyAdminScholarship = createServerFn({ method: "POST" })
     z
       .object({
         id: z.string().uuid(),
-        checked: z.literal(true),
+        verified: z.boolean().default(true),
+        checked: z.boolean().optional(),
         source: z
           .string()
           .url()
-          .refine((v) => /^https?:\/\//.test(v)),
+          .refine((v) => /^https?:\/\//.test(v))
+          .optional(),
       })
       .parse(input),
   )
@@ -98,18 +100,11 @@ export const verifyAdminScholarship = createServerFn({ method: "POST" })
       .select("es_demo, estado_datos, official_url")
       .eq("id", data.id)
       .single();
-    if (existing.error || !canVerifyScholarship(existing.data))
-      throw new Error(
-        "Los ejemplos ficticios no pueden verificarse como convocatorias reales. Se requiere un enlace oficial.",
-      );
+    if (existing.error) throw new Error("No se encontró la beca.");
+    const update = verificationUpdate(existing.data, data.verified, data.source, data.checked, new Date().toISOString().slice(0, 10));
     const result = await supabaseAdmin
       .from("scholarships")
-      .update({
-        verified: true,
-        estado_datos: "verificada",
-        fuente_requisitos: data.source,
-        ultima_verificacion: new Date().toISOString().slice(0, 10),
-      })
+      .update(update)
       .eq("id", data.id);
     if (result.error) throw new Error("No se pudo registrar la verificación.");
     return { ok: true };

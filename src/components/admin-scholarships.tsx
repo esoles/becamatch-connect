@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Search, Plus, Pencil, ClipboardCheck, ExternalLink } from "lucide-react";
+import { Search, Plus, Pencil, ExternalLink } from "lucide-react";
 import { scholarshipsQuery, fmtDate } from "@/lib/profile";
 import {
   verificationLabel,
@@ -29,6 +29,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { ScholarshipOrientation } from "@/components/scholarship-orientation";
 
 export function AdminScholarships({
@@ -57,7 +58,6 @@ export function AdminScholarships({
   const rows = (query.data ?? [])
     .filter(
       (s) =>
-        (!verificationOnly || verificationLabel(s) !== "Verificada") &&
         (!selectedId || s.id === selectedId) &&
         `${s.name} ${s.entity} ${s.country}`.toLowerCase().includes(search.toLowerCase()) &&
         (filter === "all" ||
@@ -145,6 +145,7 @@ export function AdminScholarships({
           {notice}
         </p>
       )}
+      {error && !editing && !verifying && <p role="alert" className="mb-4 text-sm text-destructive">{error}</p>}
       {query.isError && (
         <p role="alert" className="text-destructive">
           No se pudieron cargar las becas.
@@ -187,11 +188,37 @@ export function AdminScholarships({
                 <td className="px-4 py-4">{s.study_level ?? "—"}</td>
                 <td className="whitespace-nowrap px-4 py-4">{fmtDate(s.deadline)}</td>
                 <td className="px-4 py-4">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      aria-label={`Verificación de ${s.name}`}
+                      checked={verificationLabel(s) === "Verificada"}
+                      disabled={busy || !canVerifyScholarship(s)}
+                      title={s.es_demo || s.estado_datos === "propuesta_ficticia_no_verificada" ? "Datos ficticios: no se pueden verificar como reales" : !s.official_url ? "Se requiere un enlace oficial" : "Verificación manual"}
+                      onCheckedChange={async (value) => {
+                        setError("");
+                        if (value) {
+                          setVerifying(s);
+                          setSource(s.fuente_requisitos || s.official_url || "");
+                          setChecked(false);
+                          return;
+                        }
+                        setBusy(true);
+                        try {
+                          await verify({ data: { id: s.id, verified: false } });
+                          await refresh();
+                          setNotice("La beca vuelve a estar pendiente de verificación.");
+                        } catch (err) {
+                          setNotice("");
+                          setError(err instanceof Error ? err.message : "No se pudo cambiar la verificación.");
+                        } finally { setBusy(false); }
+                      }}
+                    />
                   <span
                     className={`inline-block rounded-md px-2 py-1 text-xs ${verificationLabel(s) === "Verificada" ? "bg-primary/10 text-primary" : s.es_demo ? "bg-secondary text-secondary-foreground" : "bg-warning/20 text-warning-foreground"}`}
                   >
                     {verificationLabel(s)}
                   </span>
+                  </div>
                 </td>
                 <td className="px-4 py-4">
                   <span
@@ -220,25 +247,6 @@ export function AdminScholarships({
                       }}
                     >
                       <Pencil />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={!canVerifyScholarship(s)}
-                      title={
-                        s.es_demo
-                          ? "Los ejemplos ficticios no pueden verificarse"
-                          : "Verificar fuente"
-                      }
-                      aria-label={`Verificar ${s.name}`}
-                      onClick={() => {
-                        setVerifying(s);
-                        setSource(s.fuente_requisitos || s.official_url || "");
-                        setChecked(false);
-                        setError("");
-                      }}
-                    >
-                      <ClipboardCheck />
                     </Button>
                     {s.official_url && (
                       <Button variant="ghost" size="icon" asChild>

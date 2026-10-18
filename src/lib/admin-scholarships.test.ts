@@ -4,6 +4,7 @@ import {
   verificationLabel,
   expiryLabel,
   summaryMetrics,
+  verificationUpdate,
   type AdminScholarship,
 } from "./admin-scholarships";
 const row: AdminScholarship = {
@@ -36,6 +37,16 @@ const row: AdminScholarship = {
   preguntas_frecuentes: [],
 };
 describe("administrative scholarship provenance", () => {
+  it("manually verifies after source confirmation and records the date", () => {
+    expect(verificationUpdate(row, true, "https://example.org", true, "2026-10-18")).toEqual({ verified: true, estado_datos: "verificada", fuente_requisitos: "https://example.org", ultima_verificacion: "2026-10-18" });
+    expect(() => verificationUpdate(row, true, "https://example.org", false, "2026-10-18")).toThrow();
+  });
+  it("turns verification off without inventing a verification date", () => {
+    expect(verificationUpdate(row, false, undefined, undefined, "2026-10-18")).toEqual({ verified: false, estado_datos: "pendiente_verificacion", ultima_verificacion: null });
+  });
+  it("rejects verifying demonstration records even with manual confirmation", () => {
+    expect(() => verificationUpdate({ ...row, es_demo: true }, true, "https://example.org", true, "2026-10-18")).toThrow();
+  });
   it("does not count demonstration records as real verified opportunities", () => {
     expect(summaryMetrics([{ ...row, es_demo: true }, row], "2026-10-18")).toEqual({
       total: 1,
