@@ -60,8 +60,11 @@ function AuthPage() {
   useEffect(() => {
     if (next === "admin") sessionStorage.setItem("post_login", "admin");
     // Returning from Google: once the session exists, continue to the intended page.
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) { const to = destination(); sessionStorage.removeItem("post_login"); navigate({ to }); }
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const to = destination();
+      sessionStorage.removeItem("post_login");
+      navigate({ to: to === "/admin" ? await resolveAdminDestination() : to });
     });
   }, [next, navigate]);
 
@@ -71,7 +74,9 @@ function AuthPage() {
     if (r.redirected) return;
     setLoading(false);
     if (r.error) { toast.error("No pudimos ingresar con Google."); return; }
-    const to = destination(); sessionStorage.removeItem("post_login"); navigate({ to });
+    const to = destination();
+    sessionStorage.removeItem("post_login");
+    navigate({ to: to === "/admin" ? await resolveAdminDestination() : to });
   }
 
   async function submit(e: React.FormEvent) {
@@ -85,7 +90,7 @@ function AuthPage() {
       setLoading(false);
       if (error) { toast.error("No pudimos ingresar. Revisa tus datos."); return; }
       sessionStorage.removeItem("post_login");
-      navigate({ to });
+      navigate({ to: to === "/admin" ? await resolveAdminDestination() : to });
     } else {
       const { data, error } = await supabase.auth.signUp({
         ...parsed.data,
