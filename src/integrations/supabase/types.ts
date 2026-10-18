@@ -187,6 +187,21 @@ export type Database = {
           },
         ]
       }
+      plan_year_counters: {
+        Row: {
+          last_number: number
+          year: number
+        }
+        Insert: {
+          last_number?: number
+          year: number
+        }
+        Update: {
+          last_number?: number
+          year?: number
+        }
+        Relationships: []
+      }
       postulation_requests: {
         Row: {
           ai_analysis: Json | null
@@ -481,22 +496,43 @@ export type Database = {
       }
       web_agent_plans: {
         Row: {
-          conversation_id: string
+          conversation_id: string | null
           created_at: string
+          delivery_status: string
           id: string
           plan: Json
+          plan_number: string | null
+          request_id: string | null
+          share_id: string
+          shared_content: Json | null
+          user_id: string | null
+          whatsapp_message_id: string | null
         }
         Insert: {
-          conversation_id: string
+          conversation_id?: string | null
           created_at?: string
+          delivery_status?: string
           id?: string
           plan: Json
+          plan_number?: string | null
+          request_id?: string | null
+          share_id?: string
+          shared_content?: Json | null
+          user_id?: string | null
+          whatsapp_message_id?: string | null
         }
         Update: {
-          conversation_id?: string
+          conversation_id?: string | null
           created_at?: string
+          delivery_status?: string
           id?: string
           plan?: Json
+          plan_number?: string | null
+          request_id?: string | null
+          share_id?: string
+          shared_content?: Json | null
+          user_id?: string | null
+          whatsapp_message_id?: string | null
         }
         Relationships: [
           {
@@ -504,6 +540,20 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "web_agent_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "web_agent_plans_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "postulation_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "web_agent_plans_whatsapp_message_id_fkey"
+            columns: ["whatsapp_message_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_messages"
             referencedColumns: ["id"]
           },
         ]
