@@ -26,6 +26,7 @@ import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
 import { Route as WhatsappVincularRouteImport } from './routes/whatsapp.vincular'
 import { Route as AuthenticatedBecaIdRouteImport } from './routes/_authenticated/beca.$id'
+import { Route as ApiPublicPostulationAgentRouteImport } from './routes/api/public/postulation-agent'
 import { Route as ApiPublicWhatsappRouteImport } from './routes/api/public/whatsapp'
 
 const IndexRoute = IndexRouteImport.update({
@@ -112,6 +113,12 @@ const AuthenticatedBecaIdRoute = AuthenticatedBecaIdRouteImport.update({
   path: '/beca/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicPostulationAgentRoute =
+  ApiPublicPostulationAgentRouteImport.update({
+    id: '/api/public/postulation-agent',
+    path: '/api/public/postulation-agent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicWhatsappRoute = ApiPublicWhatsappRouteImport.update({
   id: '/api/public/whatsapp',
   path: '/api/public/whatsapp',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin/': typeof AdminIndexRoute
   '/beca/$id': typeof AuthenticatedBecaIdRoute
+  '/api/public/postulation-agent': typeof ApiPublicPostulationAgentRoute
   '/api/public/whatsapp': typeof ApiPublicWhatsappRoute
 }
 export interface FileRoutesByTo {
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin': typeof AdminIndexRoute
   '/beca/$id': typeof AuthenticatedBecaIdRoute
+  '/api/public/postulation-agent': typeof ApiPublicPostulationAgentRoute
   '/api/public/whatsapp': typeof ApiPublicWhatsappRoute
 }
 export interface FileRoutesById {
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/whatsapp/vincular': typeof WhatsappVincularRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/beca/$id': typeof AuthenticatedBecaIdRoute
+  '/api/public/postulation-agent': typeof ApiPublicPostulationAgentRoute
   '/api/public/whatsapp': typeof ApiPublicWhatsappRoute
 }
 export interface FileRouteTypes {
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/whatsapp/vincular'
     | '/admin/'
     | '/beca/$id'
+    | '/api/public/postulation-agent'
     | '/api/public/whatsapp'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/whatsapp/vincular'
     | '/admin'
     | '/beca/$id'
+    | '/api/public/postulation-agent'
     | '/api/public/whatsapp'
   id:
     | '__root__'
@@ -233,6 +245,7 @@ export interface FileRouteTypes {
     | '/whatsapp/vincular'
     | '/admin/'
     | '/_authenticated/beca/$id'
+    | '/api/public/postulation-agent'
     | '/api/public/whatsapp'
   fileRoutesById: FileRoutesById
 }
@@ -243,6 +256,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   PostularRoute: typeof PostularRoute
   WhatsappVincularRoute: typeof WhatsappVincularRoute
+  ApiPublicPostulationAgentRoute: typeof ApiPublicPostulationAgentRoute
   ApiPublicWhatsappRoute: typeof ApiPublicWhatsappRoute
 }
 
@@ -367,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBecaIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/postulation-agent': {
+      id: '/api/public/postulation-agent'
+      path: '/api/public/postulation-agent'
+      fullPath: '/api/public/postulation-agent'
+      preLoaderRoute: typeof ApiPublicPostulationAgentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/whatsapp': {
       id: '/api/public/whatsapp'
       path: '/api/public/whatsapp'
@@ -425,6 +446,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   PostularRoute: PostularRoute,
   WhatsappVincularRoute: WhatsappVincularRoute,
+  ApiPublicPostulationAgentRoute: ApiPublicPostulationAgentRoute,
   ApiPublicWhatsappRoute: ApiPublicWhatsappRoute,
 }
 export const routeTree = rootRouteImport

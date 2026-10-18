@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { PostulationAgent } from "@/components/postulation-agent";
+import { ClipboardList, MessagesSquare, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/postular")({
   head: () => ({
@@ -22,6 +24,20 @@ export const Route = createFileRoute("/postular")({
 });
 
 function PostularPage() {
+  const [mode, setMode] = useState<"select" | "form" | "agent">("select");
+  if (mode === "agent") return <PostulationAgent onBack={() => setMode("select")} />;
+  if (mode === "form") return <><div className="mx-auto max-w-lg px-4 pt-6"><Button variant="ghost" onClick={() => setMode("select")}><ArrowLeft />Opciones</Button></div><PostulationForm /></>;
+  return <main className="mx-auto max-w-3xl px-4 py-10">
+    <h1 className="font-display text-3xl font-bold">Quiero postular</h1>
+    <p className="mt-2 text-muted-foreground">Encuentra becas que encajen contigo y prepara tu plan de postulación. Elige cómo quieres comenzar.</p>
+    <div className="mt-8 grid gap-5 sm:grid-cols-2">
+      <article className="flex flex-col rounded-lg border border-border bg-card p-6"><ClipboardList className="mb-4 size-8 text-primary" /><h2 className="text-xl font-semibold">Prefiero completar el formulario</h2><p className="mb-6 mt-3 flex-1 text-sm text-muted-foreground">Cuéntanos tu situación en un formulario sencillo y recibe tu plan de postulación.</p><Button onClick={() => setMode("form")}>Completar formulario</Button></article>
+      <article className="flex flex-col rounded-lg border border-border bg-card p-6"><MessagesSquare className="mb-4 size-8 text-primary" /><h2 className="text-xl font-semibold">Quiero conversar con la IA</h2><p className="mb-6 mt-3 flex-1 text-sm text-muted-foreground">Responde unas preguntas paso a paso y recibe recomendaciones personalizadas de becas.</p><Button onClick={() => setMode("agent")}>Hablar con el agente</Button></article>
+    </div>
+  </main>;
+}
+
+function PostulationForm() {
   const submit = useServerFn(submitPostulation);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
