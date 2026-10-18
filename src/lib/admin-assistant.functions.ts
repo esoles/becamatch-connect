@@ -34,8 +34,8 @@ async function gatherAdminContext(): Promise<string> {
       .limit(20),
     supabaseAdmin
       .from("scholarship_decisions")
-      .select("id, status", { count: "exact" })
-      .eq("status", "saved"),
+      .select("id, decision", { count: "exact" })
+      .eq("decision", "saved"),
     supabaseAdmin
       .from("whatsapp_messages")
       .select("id, created_at", { count: "exact" })
