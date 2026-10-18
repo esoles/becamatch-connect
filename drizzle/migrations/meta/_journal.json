@@ -85,6 +85,13 @@
       "when": 1792314575338,
       "tag": "0011_applicant_followup_and_manual_calls",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792314864023,
+      "tag": "0012_validate_applicant_administrative_writes",
+      "breakpoints": true
     }
   ]
 }

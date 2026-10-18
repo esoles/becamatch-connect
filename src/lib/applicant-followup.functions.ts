@@ -176,6 +176,9 @@ export const confirmApplicantIdentity = createServerFn({ method: "POST" })
     if (role.error || !role.data) throw new Error("Solo administradores.");
     if (data.sourceKey.startsWith("user:") || data.sourceKey === data.targetKey)
       throw new Error("No se pueden fusionar cuentas autenticadas.");
+    const sourceFollowup = await context.supabase.from("applicant_followups").select("person_key").eq("person_key", data.sourceKey).maybeSingle();
+    if (sourceFollowup.error) throw new Error("No se pudo revisar el seguimiento original.");
+    if (sourceFollowup.data) throw new Error("Esta ficha tiene seguimiento propio. Consérvala separada para no perder decisiones administrativas.");
     const links = await context.supabase
       .from("applicant_identity_links")
       .select("source_key,target_key");
