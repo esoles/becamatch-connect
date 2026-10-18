@@ -73,6 +73,7 @@ export async function loadInteractions(db: Admin) {
       title: r.full_name,
       userId: r.user_id,
       lastActivity: r.attention_status === "recibida" ? r.created_at : r.updated_at,
+      incomingAt: r.created_at,
       preview: r.request_text.slice(0, 160),
       status: r.attention_status,
       processStatus: r.status,

@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
-import { groupApplicants, stages, type Followup } from './applicant-followup';
+import { groupApplicants, type Followup } from './applicant-followup';
 import { loadInteractions } from './interaction-inbox.server';
 
 export const listApplicantFollowup = createServerFn({method:'GET'}).middleware([requireSupabaseAuth]).handler(async ({context}) => {
@@ -19,7 +19,7 @@ export const listApplicantFollowup = createServerFn({method:'GET'}).middleware([
     all((a,b)=>db.from('user_roles').select('user_id').eq('role','admin').order('user_id').range(a,b)),
   ]);
   const saved=decisions.flatMap(d=>{const s=scholarships.find(s=>s.id===d.scholarship_id);return s?[{...s,user_id:d.user_id}]:[];});
-  return {people:groupApplicants({profiles,interactions,calls,followups:followups as Followup[],links,saved},Date.now()),admins:roles.map(r=>({id:r.user_id,name:profiles.find(p=>p.id===r.user_id)?.full_name || `Administrador ${r.user_id.slice(0,8)}`}))};
+  return JSON.stringify({people:groupApplicants({profiles,interactions,calls,followups:followups as Followup[],links,saved},Date.now()),admins:roles.map(r=>({id:r.user_id,name:profiles.find(p=>p.id===r.user_id)?.full_name || `Administrador ${r.user_id.slice(0,8)}`}))});
 });
 const key=z.string().regex(/^(user|form|web|wa|call):[0-9a-f-]{36}$/);
 export const saveApplicantFollowup=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(d=>z.object({personKey:key,stage:z.enum(['nuevo','contactado','preparando','seguimiento','ganado','perdido']),nextAction:z.string().max(500),followupAt:z.string().datetime().nullable(),assignedTo:z.string().uuid().nullable(),objective:z.string().max(1000),resolve:z.boolean()}).refine(d=>d.stage!=='ganado'||d.objective.trim().length>0,'Define el objetivo administrativo alcanzado.').parse(d)).handler(async({data,context})=>{
@@ -31,7 +31,7 @@ export const saveApplicantFollowup=createServerFn({method:'POST'}).middleware([r
 export const recordApplicantCall=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(d=>z.object({name:z.string().max(120),userId:z.string().uuid().nullable(),occurredAt:z.string().datetime(),notes:z.string().min(10).max(2000),requiresResponse:z.boolean()}).parse(d)).handler(async({data,context})=>{
   const role=await context.supabase.rpc('has_role',{_user_id:context.userId,_role:'admin'});if(role.error||!role.data)throw new Error('Solo administradores.');
   if(Date.parse(data.occurredAt)>Date.now())throw new Error('No registres una llamada futura como realizada.');
-  if(data.userId){const {supabaseAdmin:db}=await import('@/integrations/supabase/client.server');const u=await db.auth.getUserById(data.userId);if(u.error||!u.data.user)throw new Error('Usuario no encontrado.');}
+  if(data.userId){const {supabaseAdmin:db}=await import('@/integrations/supabase/client.server');const u=await db.auth.admin.getUserById(data.userId);if(u.error||!u.data.user)throw new Error('Usuario no encontrado.');}
   const r=await context.supabase.from('applicant_calls').insert({full_name:data.name,user_id:data.userId,occurred_at:data.occurredAt,notes:data.notes,requires_response:data.requiresResponse,created_by:context.userId});if(r.error)throw new Error('No se pudo registrar la llamada.');return {ok:true};
 });
 export const confirmApplicantIdentity=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(d=>z.object({sourceKey:key,targetKey:key,evidence:z.string().trim().min(10).max(1000)}).parse(d)).handler(async({data,context})=>{

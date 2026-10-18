@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { listApplicantFollowup } from "@/lib/applicant-followup.functions";
 import { ApplicantFollowupView } from "@/components/applicant-followup";
-const followupQuery = queryOptions({queryKey:["admin","applicant-followup"],queryFn:()=>listApplicantFollowup(),refetchInterval:60000});
+import type { Applicant } from "@/lib/applicant-followup";
+const followupQuery = queryOptions({queryKey:["admin","applicant-followup"],queryFn:async()=>JSON.parse(await listApplicantFollowup()) as {people:Applicant[];admins:{id:string;name:string}[]},refetchInterval:60000});
 
 export const Route = createFileRoute("/admin/postulantes")({
   loader: ({ context }) => context.queryClient.ensureQueryData(followupQuery),

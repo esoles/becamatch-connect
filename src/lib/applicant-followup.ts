@@ -10,23 +10,25 @@ export function responseState(interactions: InboxInteraction[], calls: Call[], f
   if (f.stage === 'ganado' || f.stage === 'perdido') return { response: 'answered' as const, pendingSince: null };
   const pending: string[] = [];
   let known = false;
+  let unknown = false;
   for (const r of interactions) {
     if (r.status === 'atendida') { known = true; continue; }
     if (r.channel === 'Formulario') {
-      if (r.processStatus === 'correo_enviado') continue; // Provider acceptance is not delivery evidence.
-      pending.push(r.lastActivity); known = true; continue;
+      if (r.processStatus === 'correo_enviado') { unknown = true; continue; } // Provider acceptance is not delivery evidence.
+      pending.push(r.incomingAt ?? r.lastActivity); known = true; continue;
     }
     const incoming = r.messages.filter(m => m.direction === 'user' || m.direction === 'entrante').sort((a,b) => a.date.localeCompare(b.date)).at(-1);
-    if (!incoming) continue;
+    if (!incoming) { unknown = true; continue; }
     const answered = r.channel === 'Agente web' && r.messages.some(m => m.direction === 'assistant' && m.date >= incoming.date && m.message?.parts.some(p => p.type === 'text' && p.text.trim()));
     if (answered) known = true;
     else if (r.channel === 'Agente web') { known = true; pending.push(incoming.date); }
     // WhatsApp outgoing logs have no delivery receipt: do not infer an effective response.
     else if (!r.messages.some(m => m.direction === 'saliente' && m.date >= incoming.date)) { known = true; pending.push(incoming.date); }
+    else if (!f.response_resolved_at || incoming.date > f.response_resolved_at) unknown = true;
   }
   for (const c of calls) { known = true; if (c.requires_response) pending.push(c.occurred_at); }
   const unresolved = pending.filter(t => !f.response_resolved_at || t > f.response_resolved_at).sort();
-  return { response: unresolved.length ? 'pending' as const : known || f.response_resolved_at ? 'answered' as const : 'unknown' as const, pendingSince: unresolved.at(-1) ?? null };
+  return { response: unresolved.length ? 'pending' as const : unknown ? 'unknown' as const : known || f.response_resolved_at ? 'answered' as const : 'unknown' as const, pendingSince: unresolved.at(-1) ?? null };
 }
 export function overdue(p: Pick<Applicant, 'pendingSince' | 'response'>, now: number) {
   return p.response === 'pending' && !!p.pendingSince && now - Date.parse(p.pendingSince) > 3 * DAY;
