@@ -12,9 +12,17 @@ export const generateAgentPlan = createServerFn({ method: "POST" })
     const { openConversation } = await import("./agent-history.server");
     const { db } = await openConversation(data);
     const plan = await readPlan(data.profile);
-    const result = await db.from("web_agent_plans").insert({ conversation_id: data.conversationId, plan: plan as unknown as import("@/integrations/supabase/types").Json });
+    const result = await db
+      .from("web_agent_plans")
+      .insert({
+        conversation_id: data.conversationId,
+        plan: plan as unknown as import("@/integrations/supabase/types").Json,
+      });
     if (result.error) throw new Error("No se pudo guardar el plan.");
-    const updated = await db.from("web_agent_conversations").update({ updated_at: new Date().toISOString() }).eq("id", data.conversationId);
+    const updated = await db
+      .from("web_agent_conversations")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", data.conversationId);
     if (updated.error) throw new Error("No se pudo actualizar la conversación.");
     return plan;
   });
