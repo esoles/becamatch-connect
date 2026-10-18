@@ -4,7 +4,7 @@ export const CEFR = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export type Cefr = (typeof CEFR)[number];
 
 export const WEIGHTS = { level: 30, area: 25, language: 15, gpa: 20, country: 10 } as const;
-type Criterion = keyof typeof WEIGHTS;
+export type Criterion = keyof typeof WEIGHTS;
 
 export interface UserLanguage {
   code: string;
