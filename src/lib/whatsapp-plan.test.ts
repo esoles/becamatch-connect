@@ -18,18 +18,18 @@ describe("WhatsApp plan reply through existing webhook", () => {
     const db = {
       from: (table: string) => {
         const chain: Record<string, unknown> = {};
-        chain.select = () => chain;
-        chain.eq = () => chain;
-        chain.maybeSingle = async () => ({
+        chain["select"] = () => chain;
+        chain["eq"] = () => chain;
+        chain["maybeSingle"] = async () => ({
           data: table === "whatsapp_sessions" ? { user_id: null } : null,
           error: null,
         });
-        chain.single = async () => ({ data: { id: "real-incoming-record" }, error: null });
-        chain.insert = (value: Record<string, unknown>) => {
+        chain["single"] = async () => ({ data: { id: "real-incoming-record" }, error: null });
+        chain["insert"] = (value: Record<string, unknown>) => {
           inserts.push({ table, value });
           return chain;
         };
-        chain.then = (resolve: (v: unknown) => void) => resolve({ data: [], error: null });
+        chain["then"] = (resolve: (v: unknown) => void) => resolve({ data: [], error: null });
         return chain;
       },
     };
@@ -45,8 +45,8 @@ describe("WhatsApp plan reply through existing webhook", () => {
       { opportunities: [] },
       { whatsappMessageId: "real-incoming-record", userId: null },
     );
-    expect(inserts.at(-1)?.value.result).toBe("respuesta_preparada");
-    expect(inserts.filter((i) => i.value.direction === "entrante")).toHaveLength(1);
+    expect(inserts.at(-1)?.value["result"]).toBe("respuesta_preparada");
+    expect(inserts.filter((i) => i.value["direction"] === "entrante")).toHaveLength(1);
     expect(result).not.toMatch(/entregado|enviado|obtenida/);
   });
 });
