@@ -1,5 +1,10 @@
 # Scholarship data expansion
 
+# Account placement and manual verification
+- [x] Place the account menu immediately after Mi perfil.
+- [x] Add a role-protected verification switch with source confirmation; preserve fictional provenance instead of falsely marking demos verified.
+- [ ] Test verification rules and signed-in menu/admin controls.
+
 # Secure application plans
 - [x] Reuse plan generation and persist sequential numbers, safe share content and source relationships.
 - [x] Connect web form, agent and existing WhatsApp webhook plan replies; preserve delivery limitations and follow-up stages. WhatsApp delivery remains blocked by the real exchange noted below.

@@ -30,3 +30,18 @@ export function summaryMetrics(rows: AdminScholarship[], today: string) {
       .length,
   };
 }
+export function verificationUpdate(
+  scholarship: Pick<AdminScholarship, "es_demo" | "estado_datos" | "official_url">,
+  verified: boolean,
+  source: string | undefined,
+  checked: boolean | undefined,
+  today: string,
+) {
+  if (scholarship.es_demo || scholarship.estado_datos === "propuesta_ficticia_no_verificada")
+    throw new Error("Los ejemplos ficticios deben conservar la etiqueta Datos de demostración.");
+  if (!verified)
+    return { verified: false, estado_datos: "pendiente_verificacion", ultima_verificacion: null };
+  if (!canVerifyScholarship(scholarship) || !checked || !source || !/^https?:\/\//.test(source))
+    throw new Error("Confirma la comprobación de los datos e indica la fuente oficial consultada.");
+  return { verified: true, estado_datos: "verificada", fuente_requisitos: source, ultima_verificacion: today };
+}
