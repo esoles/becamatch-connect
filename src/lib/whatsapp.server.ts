@@ -5,6 +5,7 @@ import type { ScholarshipFacts } from "./assistant.server";
 import { fmtDate } from "./profile";
 import { buildSystemPrompt, callAssistantAi } from "./assistant.server";
 import { buildDeck, type CompatProfile } from "./compatibility";
+import { verifiedCatalog, planForSelection, saveSharedPlan } from "./shared-plan.server";
 
 type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
 type Sch = ScholarshipFacts & { id: string };
@@ -53,7 +54,20 @@ export async function handleIncoming(db: Admin, phone: string, body: string, ori
 
   let reply: string, action: string | null = null, result: string | null = null, sid: string | null = null;
 
-  if (/\bguardar\b/.test(q)) {
+  if (/\bplan\b/.test(q) || /\b(quiero postular|ayuda para postular|ayuda con la postulacion)\b/.test(q)) {
+    action = "plan";
+    const incoming = await db.from("whatsapp_messages").insert({ phone, direction: "entrante", body, user_id: userId, action }).select("id").single();
+    if (incoming.error || !incoming.data) throw new Error("No se pudo guardar la solicitud del plan.");
+    const catalog = await verifiedCatalog(db);
+    const chosen = findScholarship(catalog as Sch[], body) ?? catalog.find((s) => s.id === current?.id);
+    const profile = userId ? await db.from("profiles").select("study_level,area,countries,languages,gpa").eq("id", userId).maybeSingle() : null;
+    if (profile?.error) throw new Error("No se pudo consultar el perfil.");
+    const plan = await saveSharedPlan(db, planForSelection(chosen ? [chosen] : [], profile?.data as unknown as CompatProfile | null), { whatsappMessageId: incoming.data.id, userId });
+    reply = `Tu plan ${plan.planNumber}:\n${origin}/plan/${plan.shareId}\n${plan.notice}\nLa postulación se realiza fuera de BecaMatch.`;
+    const logged = await log("saliente", reply, { action, result: "respuesta_preparada", user_id: userId });
+    if (logged.error) throw new Error("No se pudo registrar la respuesta preparada.");
+    return reply; // Returned to the existing token-validated Twilio webhook; this is not a delivery receipt.
+  } else if (/\bguardar\b/.test(q)) {
     action = "guardar";
     if (!current) { reply = "Primero dime qué beca te interesa. Ej.: «Dame información de la BECA ABC»."; result = "sin_beca"; }
     else if (userId) {
