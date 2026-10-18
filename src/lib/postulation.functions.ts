@@ -94,29 +94,63 @@ export const submitPostulation = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
     const { verifiedIdentity } = await import("./agent-history.server");
-    const { verifiedCatalog, planForSelection, saveSharedPlan, sendStoredPlanEmail } = await import("./shared-plan.server");
+    const { verifiedCatalog, planForSelection, saveSharedPlan, sendStoredPlanEmail } =
+      await import("./shared-plan.server");
     const userId = await verifiedIdentity(data.accessToken);
-    const inserted = await db.from("postulation_requests").insert({
-      full_name: data.fullName, email: data.email, request_text: data.requestText,
-      status: "recibida", user_id: userId,
-    }).select("id").single();
-    if (inserted.error || !inserted.data) return { ok: false as const, error: "No se pudo registrar tu solicitud." };
+    const inserted = await db
+      .from("postulation_requests")
+      .insert({
+        full_name: data.fullName,
+        email: data.email,
+        request_text: data.requestText,
+        status: "recibida",
+        user_id: userId,
+      })
+      .select("id")
+      .single();
+    if (inserted.error || !inserted.data)
+      return { ok: false as const, error: "No se pudo registrar tu solicitud." };
     const catalog = await verifiedCatalog(db);
-    const analysis = catalog.length ? await analyzeWithAI(data.requestText, catalog) : { needs: {}, ids: [] };
+    const analysis = catalog.length
+      ? await analyzeWithAI(data.requestText, catalog)
+      : { needs: {}, ids: [] };
     // AI selects only existing catalog IDs. No arbitrary closest-deadline fallback.
     const selected = catalog.filter((s) => analysis.ids.includes(s.id));
-    const profileResult = userId ? await db.from("profiles").select("study_level,area,countries,languages,gpa").eq("id", userId).maybeSingle() : null;
+    const profileResult = userId
+      ? await db
+          .from("profiles")
+          .select("study_level,area,countries,languages,gpa")
+          .eq("id", userId)
+          .maybeSingle()
+      : null;
     if (profileResult?.error) throw new Error("No se pudo consultar tu perfil.");
-    const profile = profileResult?.data as unknown as import("./compatibility").CompatProfile | null;
-    const plan = await saveSharedPlan(db, planForSelection(selected, profile ?? null), { requestId: inserted.data.id, userId });
-    const updated = await db.from("postulation_requests").update({
-      ai_analysis: analysis.needs as import("@/integrations/supabase/types").Json,
-      recommended_scholarship_ids: selected.map((s) => s.id), status: "plan_generado",
-    }).eq("id", inserted.data.id);
-    if (updated.error) throw new Error("El plan se guardó, pero no se pudo actualizar la solicitud.");
+    const profile = profileResult?.data as unknown as
+      import("./compatibility").CompatProfile | null;
+    const plan = await saveSharedPlan(db, planForSelection(selected, profile ?? null), {
+      requestId: inserted.data.id,
+      userId,
+    });
+    const updated = await db
+      .from("postulation_requests")
+      .update({
+        ai_analysis: analysis.needs as import("@/integrations/supabase/types").Json,
+        recommended_scholarship_ids: selected.map((s) => s.id),
+        status: "plan_generado",
+      })
+      .eq("id", inserted.data.id);
+    if (updated.error)
+      throw new Error("El plan se guardó, pero no se pudo actualizar la solicitud.");
     const email = await sendStoredPlanEmail(db, plan.shareId, data.email);
-    const delivery = await db.from("postulation_requests").update({ status: email.ok ? "correo_enviado" : "plan_generado" }).eq("id", inserted.data.id);
+    const delivery = await db
+      .from("postulation_requests")
+      .update({ status: email.ok ? "correo_enviado" : "plan_generado" })
+      .eq("id", inserted.data.id);
     if (delivery.error) throw new Error("No se pudo registrar el estado del correo.");
-    return { ok: true as const, shareId: plan.shareId, planNumber: plan.planNumber,
-      emailAccepted: email.ok, emailError: email.ok ? null : email.error ?? "Correo no disponible." };
+    return {
+      ok: true as const,
+      shareId: plan.shareId,
+      planNumber: plan.planNumber,
+      emailAccepted: email.ok,
+      emailError: email.ok ? null : (email.error ?? "Correo no disponible."),
+    };
   });

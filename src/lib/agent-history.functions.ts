@@ -34,12 +34,16 @@ export const restoreAgentConversation = createServerFn({ method: "POST" })
     if (messages.error || plans.error) throw new Error("No se pudo recuperar la conversación.");
     return JSON.stringify({
       messages: (messages.data ?? []).map((r) => r.message as unknown as UIMessage),
-      plan: plans.data?.[0] ? {
-        ...(plans.data[0].plan as unknown as AgentPlan),
-        planNumber: plans.data[0].plan_number,
-        shareId: plans.data[0].share_id,
-        shareUrl: plans.data[0].plan_number ? `https://becamatch-connect.lovable.app/plan/${plans.data[0].share_id}` : undefined,
-        createdAt: plans.data[0].created_at,
-      } : null,
+      plan: plans.data?.[0]
+        ? {
+            ...(plans.data[0].plan as unknown as AgentPlan),
+            planNumber: plans.data[0].plan_number,
+            shareId: plans.data[0].share_id,
+            shareUrl: plans.data[0].plan_number
+              ? `https://becamatch-connect.lovable.app/plan/${plans.data[0].share_id}`
+              : undefined,
+            createdAt: plans.data[0].created_at,
+          }
+        : null,
     });
   });

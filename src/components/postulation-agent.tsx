@@ -342,11 +342,32 @@ function AgentConversation({
           aria-label="Plan personalizado"
         >
           <h2 className="text-xl font-semibold">Tu plan de postulación</h2>
-          {plan.shareId && <div className="flex flex-wrap items-center gap-3">
-            <strong className="text-primary">{plan.planNumber}</strong>
-            <Button asChild variant="outline"><a href={`/plan/${plan.shareId}`} target="_blank" rel="noopener noreferrer"><ExternalLink />Consultar plan</a></Button>
-            <Button variant="ghost" onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/plan/${plan.shareId}`); } catch { setProblem("No se pudo copiar el enlace. Abre el plan para copiarlo."); } }}><ClipboardCopy />Copiar enlace</Button>
-          </div>}
+          {plan.shareId && (
+            <div className="flex flex-wrap items-center gap-3">
+              <strong className="text-primary">{plan.planNumber}</strong>
+              <Button asChild variant="outline">
+                <a href={`/plan/${plan.shareId}`} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink />
+                  Consultar plan
+                </a>
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `${window.location.origin}/plan/${plan.shareId}`,
+                    );
+                  } catch {
+                    setProblem("No se pudo copiar el enlace. Abre el plan para copiarlo.");
+                  }
+                }}
+              >
+                <ClipboardCopy />
+                Copiar enlace
+              </Button>
+            </div>
+          )}
           <ProfileSummary profile={plan.profile} />
           <p className="text-sm text-muted-foreground">{plan.notice}</p>
           {plan.opportunities.map((s) => (
@@ -397,7 +418,13 @@ function AgentConversation({
               setProblem("");
               try {
                 const result = await sendEmail({
-                  data: { shareId: plan.shareId ?? "", conversationId: initial.conversationId, resumeToken: initial.resumeToken, email, requested: true },
+                  data: {
+                    shareId: plan.shareId ?? "",
+                    conversationId: initial.conversationId,
+                    resumeToken: initial.resumeToken,
+                    email,
+                    requested: true,
+                  },
                 });
                 if (result.ok) setMailState("sent");
                 else {

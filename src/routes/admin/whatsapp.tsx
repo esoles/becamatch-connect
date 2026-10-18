@@ -324,7 +324,17 @@ function InteractionInbox() {
                   {selected.plans.map(({ plan, date: created }, i) => (
                     <section key={`${created}-${i}`} className="mt-6 border-t border-border pt-5">
                       <h4 className="font-semibold">Plan de postulación · {date(created)}</h4>
-                      {plan.shareId && plan.planNumber && <Button asChild variant="outline" className="mt-3"><a href={`/plan/${plan.shareId}`} target="_blank" rel="noopener noreferrer">Consultar {plan.planNumber}</a></Button>}
+                      {plan.shareId && plan.planNumber && (
+                        <Button asChild variant="outline" className="mt-3">
+                          <a
+                            href={`/plan/${plan.shareId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Consultar {plan.planNumber}
+                          </a>
+                        </Button>
+                      )}
                       <p className="mt-2 text-sm text-muted-foreground">{plan.notice}</p>
                       {plan.opportunities.map((o) => (
                         <div key={o.id} className="mt-4 text-sm">
