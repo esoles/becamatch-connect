@@ -5,21 +5,46 @@ const inputSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(200),
   requestText: z.string().trim().min(20).max(2000),
+  accessToken: z.string().max(5000).optional(),
 });
 
 type ScholarshipRow = {
-  id: string; name: string; entity: string; country: string; deadline: string;
-  study_level: string | null; area: string | null; min_gpa: number | null;
-  coverage: string | null; requirements: string | null; documents: string | null;
-  official_url: string | null; language_code: string | null; language_level: string | null;
+  id: string;
+  name: string;
+  entity: string;
+  country: string;
+  deadline: string;
+  study_level: string | null;
+  area: string | null;
+  min_gpa: number | null;
+  coverage: string | null;
+  requirements: string | null;
+  documents: string | null;
+  official_url: string | null;
+  language_code: string | null;
+  language_level: string | null;
 };
 
-const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+const esc = (t: string) =>
+  t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
-async function analyzeWithAI(requestText: string, catalog: ScholarshipRow[]): Promise<{ needs: Record<string, unknown>; ids: string[] }> {
+async function analyzeWithAI(
+  requestText: string,
+  catalog: ScholarshipRow[],
+): Promise<{ needs: Record<string, unknown>; ids: string[] }> {
   const LOVABLE_API_KEY = process.env["LOVABLE_API_KEY"];
   if (!LOVABLE_API_KEY) return { needs: {}, ids: [] };
-  const list = catalog.map((s) => ({ id: s.id, nombre: s.name, entidad: s.entity, pais: s.country, nivel: s.study_level, area: s.area, promedio_minimo: s.min_gpa, fecha_limite: s.deadline, idioma: s.language_code ? `${s.language_code} ${s.language_level ?? ""}`.trim() : null }));
+  const list = catalog.map((s) => ({
+    id: s.id,
+    nombre: s.name,
+    entidad: s.entity,
+    pais: s.country,
+    nivel: s.study_level,
+    area: s.area,
+    promedio_minimo: s.min_gpa,
+    fecha_limite: s.deadline,
+    idioma: s.language_code ? `${s.language_code} ${s.language_level ?? ""}`.trim() : null,
+  }));
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOVABLE_API_KEY}` },
@@ -27,8 +52,15 @@ async function analyzeWithAI(requestText: string, catalog: ScholarshipRow[]): Pr
       model: "openai/gpt-6-astra",
       reasoning_effort: "low",
       messages: [
-        { role: "system", content: "Eres un asistente de BecaMatch. Analiza la solicitud del estudiante y elige hasta 3 becas del catálogo que mejor encajen. NUNCA inventes becas: solo puedes devolver IDs exactos del catálogo. Responde SOLO con JSON." },
-        { role: "user", content: `Solicitud del estudiante:\n${requestText}\n\nCatálogo de becas (JSON):\n${JSON.stringify(list)}\n\nDevuelve JSON con: {"needs": {"nivel": string|null, "area": string|null, "paises": string[], "promedio": number|null}, "recommended_ids": string[]}` },
+        {
+          role: "system",
+          content:
+            "Eres un asistente de BecaMatch. Analiza la solicitud del estudiante y elige hasta 3 becas del catálogo que mejor encajen. NUNCA inventes becas: solo puedes devolver IDs exactos del catálogo. Responde SOLO con JSON.",
+        },
+        {
+          role: "user",
+          content: `Solicitud del estudiante:\n${requestText}\n\nCatálogo de becas (JSON):\n${JSON.stringify(list)}\n\nDevuelve JSON con: {"needs": {"nivel": string|null, "area": string|null, "paises": string[], "promedio": number|null}, "recommended_ids": string[]}`,
+        },
       ],
       response_format: {
         type: "json_schema",
@@ -66,7 +98,9 @@ async function analyzeWithAI(requestText: string, catalog: ScholarshipRow[]): Pr
   try {
     const parsed = JSON.parse(json.choices?.[0]?.message?.content ?? "{}");
     const valid = new Set(catalog.map((s) => s.id));
-    const ids = (Array.isArray(parsed.recommended_ids) ? parsed.recommended_ids : []).filter((id: unknown) => typeof id === "string" && valid.has(id)).slice(0, 3);
+    const ids = (Array.isArray(parsed.recommended_ids) ? parsed.recommended_ids : [])
+      .filter((id: unknown) => typeof id === "string" && valid.has(id))
+      .slice(0, 3);
     return { needs: parsed.needs ?? {}, ids };
   } catch {
     return { needs: {}, ids: [] };
@@ -74,9 +108,10 @@ async function analyzeWithAI(requestText: string, catalog: ScholarshipRow[]): Pr
 }
 
 function buildEmailHtml(name: string, becas: ScholarshipRow[], appUrl: string): string {
-  const items = becas.map((s) => {
-    const link = `${appUrl.replace(/\/$/, "")}/beca/${s.id}`;
-    return `<div style="border:1px solid #e5e5e5;border-radius:8px;padding:16px;margin:12px 0">
+  const items = becas
+    .map((s) => {
+      const link = `${appUrl.replace(/\/$/, "")}/beca/${s.id}`;
+      return `<div style="border:1px solid #e5e5e5;border-radius:8px;padding:16px;margin:12px 0">
       <h3 style="margin:0 0 4px">${esc(s.name)}</h3>
       <p style="margin:2px 0;color:#555">${esc(s.entity)} · ${esc(s.country)}</p>
       <p style="margin:2px 0"><b>Fecha límite:</b> ${esc(s.deadline)}</p>
@@ -86,7 +121,8 @@ function buildEmailHtml(name: string, becas: ScholarshipRow[], appUrl: string): 
       ${s.official_url ? `<p style="margin:2px 0"><a href="${esc(s.official_url)}">Enlace oficial</a></p>` : ""}
       <p style="margin:8px 0 0"><a href="${esc(link)}" style="background:#0d9488;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;display:inline-block">Ver en BecaMatch</a></p>
     </div>`;
-  }).join("");
+    })
+    .join("");
   return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
     <h2>Hola ${esc(name)},</h2>
     <p>Gracias por contarnos tu situación. Estas son las becas que mejor encajan contigo:</p>
@@ -100,21 +136,35 @@ export const submitPostulation = createServerFn({ method: "POST" })
   .inputValidator((d) => inputSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { verifiedIdentity } = await import("./agent-history.server");
+    const userId = await verifiedIdentity(data.accessToken);
 
     const { data: inserted, error: insErr } = await supabaseAdmin
       .from("postulation_requests")
-      .insert({ full_name: data.fullName, email: data.email, request_text: data.requestText, status: "recibida" })
+      .insert({
+        full_name: data.fullName,
+        email: data.email,
+        request_text: data.requestText,
+        status: "recibida",
+        user_id: userId,
+      })
       .select("id")
       .single();
     if (insErr || !inserted) {
       console.error("insert postulation failed", insErr);
-      return { ok: false as const, error: "No se pudo registrar tu solicitud. Inténtalo de nuevo." };
+      return {
+        ok: false as const,
+        error: "No se pudo registrar tu solicitud. Inténtalo de nuevo.",
+      };
     }
 
     const today = new Date().toISOString().slice(0, 10);
     const { data: catalog } = await supabaseAdmin
-      .from("scholarships").select("*")
-      .eq("archived", false).gte("deadline", today).order("deadline");
+      .from("scholarships")
+      .select("*")
+      .eq("archived", false)
+      .gte("deadline", today)
+      .order("deadline");
 
     const becas = (catalog ?? []) as ScholarshipRow[];
     const analysis = await analyzeWithAI(data.requestText, becas);
@@ -123,8 +173,13 @@ export const submitPostulation = createServerFn({ method: "POST" })
       ? analysis.ids.map((id) => becas.find((b) => b.id === id)!).filter(Boolean)
       : becas.slice(0, 3);
 
-    await supabaseAdmin.from("postulation_requests")
-      .update({ ai_analysis: analysis.needs as import("@/integrations/supabase/types").Json, recommended_scholarship_ids: recommended.map((b) => b.id), status: "analizada" })
+    await supabaseAdmin
+      .from("postulation_requests")
+      .update({
+        ai_analysis: analysis.needs as import("@/integrations/supabase/types").Json,
+        recommended_scholarship_ids: recommended.map((b) => b.id),
+        status: "analizada",
+      })
       .eq("id", inserted.id);
 
     const LOVABLE_API_KEY = process.env["LOVABLE_API_KEY"];
@@ -134,7 +189,11 @@ export const submitPostulation = createServerFn({ method: "POST" })
       const appUrl = process.env["APP_URL"] ?? "https://becamatch-connect.lovable.app";
       const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOVABLE_API_KEY}`, "X-Connection-Api-Key": RESEND_API_KEY },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "X-Connection-Api-Key": RESEND_API_KEY,
+        },
         body: JSON.stringify({
           from: "BecaMatch <onboarding@resend.dev>",
           to: [data.email],
@@ -145,6 +204,9 @@ export const submitPostulation = createServerFn({ method: "POST" })
       if (res.ok) emailStatus = "correo_enviado";
       else console.error(`Resend failed [${res.status}]: ${await res.text()}`);
     }
-    await supabaseAdmin.from("postulation_requests").update({ status: emailStatus }).eq("id", inserted.id);
+    await supabaseAdmin
+      .from("postulation_requests")
+      .update({ status: emailStatus })
+      .eq("id", inserted.id);
     return { ok: true as const };
   });

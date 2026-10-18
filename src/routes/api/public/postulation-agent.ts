@@ -3,6 +3,7 @@ import { convertToModelMessages, validateUIMessages, tool, isStepCount } from "a
 import { agentProfileSchema } from "@/lib/postulation-agent";
 import { createResponsesCall } from "@/lib/ai/responses.server";
 import { buildSystemPrompt } from "@/lib/assistant.server";
+import { resumeSchema } from "@/lib/agent-history.functions";
 
 export const Route = createFileRoute("/api/public/postulation-agent")({
   server: {
@@ -27,6 +28,21 @@ export const Route = createFileRoute("/api/public/postulation-agent")({
             }),
           };
           const messages = await validateUIMessages({ messages: input.messages, tools });
+          const credential = resumeSchema.parse(input);
+          const { openConversation, appendMessages, verifiedIdentity } = await import("@/lib/agent-history.server");
+          const { db, conversation } = await openConversation(credential);
+          const userId = await verifiedIdentity(request.headers.get("authorization")?.replace(/^Bearer /, ""));
+          if (userId && !conversation.user_id) {
+            const linked = await db.from("web_agent_conversations").update({ user_id: userId }).eq("id", conversation.id).is("user_id", null);
+            if (linked.error) throw new Error("No se pudo asociar la conversación.");
+          }
+          const history = await db.from("web_agent_messages").select("message").eq("conversation_id", conversation.id).order("created_at");
+          if (history.error) throw new Error("No se pudo recuperar el historial.");
+          const lastUser = [...messages].reverse().find((m) => m.role === "user");
+          if (!lastUser) throw new Error("Falta el mensaje del usuario.");
+          await appendMessages(credential, [lastUser]);
+          const stored = (history.data ?? []).map((r) => r.message as unknown as import("ai").UIMessage);
+          const trustedMessages = [...stored.filter((m) => m.id !== lastUser.id), lastUser];
           const key = process.env["LOVABLE_API_KEY"];
           if (!key) return new Response("El servicio de IA no está configurado.", { status: 401 });
           const prompt = `${buildSystemPrompt({ scholarship: null, channel: "web" })}
@@ -38,11 +54,13 @@ Eres el orientador de planes de postulación. Mantén una sola conversación en 
               apiKey: key,
               model: "openai/gpt-6-astra",
             },
-            await convertToModelMessages(messages),
+            await convertToModelMessages(trustedMessages),
             prompt,
             { tools, stopWhen: isStepCount(50), maxRetries: 0 },
           );
-          return call.response(messages);
+          return call.response(messages, async ({ responseMessage }) => {
+            await appendMessages(credential, [responseMessage]);
+          });
         } catch (error) {
           if (request.signal.aborted) return new Response(null, { status: 499 });
           console.error("Postulation agent request failed", error);

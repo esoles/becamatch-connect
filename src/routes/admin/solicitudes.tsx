@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,14 +24,22 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/admin/solicitudes")({
-  validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({ id: typeof s["id"] === "string" ? s["id"] : undefined }),
+  validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({
+    id: typeof s["id"] === "string" ? s["id"] : undefined,
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(solicitudesQuery),
   head: () => ({
     meta: [
       { title: "Solicitudes de postulación — BecaMatch" },
-      { name: "description", content: "Solicitudes recibidas desde el formulario público de postulación." },
+      {
+        name: "description",
+        content: "Solicitudes recibidas desde el formulario público de postulación.",
+      },
       { property: "og:title", content: "Solicitudes de postulación — BecaMatch" },
-      { property: "og:description", content: "Solicitudes recibidas desde el formulario público de postulación." },
+      {
+        property: "og:description",
+        content: "Solicitudes recibidas desde el formulario público de postulación.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -42,7 +50,7 @@ export const Route = createFileRoute("/admin/solicitudes")({
 function SolicitudesPage() {
   const { data: rows } = useSuspenseQuery(solicitudesQuery);
   const { id } = Route.useSearch();
-  const visibleRows = id ? rows.filter(r => r.id === id) : rows;
+  const visibleRows = id ? rows.filter((r) => r.id === id) : rows;
   return (
     <section className="mt-6">
       <h2 className="font-display text-xl font-semibold">Solicitudes de postulación</h2>
@@ -67,12 +75,24 @@ function SolicitudesPage() {
             <tbody>
               {visibleRows.map((r) => (
                 <tr key={r.id} className="border-t border-border">
-                  <td className="px-4 py-2 font-medium">{r.full_name}</td>
+                  <td className="px-4 py-2 font-medium">
+                    <Link
+                      to="/admin/whatsapp"
+                      search={{ interaction: `form:${r.id}` }}
+                      className="text-primary underline"
+                    >
+                      {r.full_name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-2">{r.email}</td>
-                  <td className="max-w-xs px-4 py-2"><span className="line-clamp-2">{r.request_text}</span></td>
+                  <td className="max-w-xs px-4 py-2">
+                    <span className="line-clamp-2">{r.request_text}</span>
+                  </td>
                   <td className="px-4 py-2">{r.recommended_scholarship_ids.length}</td>
                   <td className="px-4 py-2">{STATUS_LABEL[r.status] ?? r.status}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">{fmtDate(r.created_at.slice(0, 10))}</td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    {fmtDate(r.created_at.slice(0, 10))}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,4 +1,10 @@
 # Scholarship data expansion
+
+# Central interaction inbox
+- [x] Persist web-agent messages and generated plans with secure anonymous resumption.
+- [x] Centralize forms, web-agent and WhatsApp in the existing admin section with filters, details and reliable related-record navigation.
+- [x] Verify real form submission, AI response and plan restoration, filters, latest selection, related-record navigation, attention-status readback and signed-out backend rejection.
+- [ ] Verify a real WhatsApp exchange and provider delivery: blocked pending Twilio Sandbox activation and a real incoming message; existing stored history is visible without claiming delivery.
  
 # Administrative navigation redesign
 - [x] Separate student navigation and role-restricted account menus.

@@ -1,5 +1,12 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { streamText, type ModelMessage, type UIMessage, type ToolSet, isStepCount } from "ai";
+import {
+  streamText,
+  type ModelMessage,
+  type UIMessage,
+  type ToolSet,
+  type UIMessageStreamOnFinishCallback,
+  isStepCount,
+} from "ai";
 
 import {
   createLovableAiGatewayRunIdFetch,
@@ -50,12 +57,15 @@ export function createResponsesCall(
   });
   return {
     result,
-    response: async (originalMessages: UIMessage[]) => {
+    response: async (
+      originalMessages: UIMessage[],
+      onFinish?: UIMessageStreamOnFinishCallback<UIMessage>,
+    ) => {
       const response = await withLovableAiGatewayRunIdHeader(
         result.toUIMessageStreamResponse({
           originalMessages,
           sendReasoning: true,
-          onFinish: () => {},
+          onFinish: onFinish ?? (() => {}),
           onError: (error) =>
             error instanceof Error ? error.message : "No se pudo completar la respuesta.",
         }),
