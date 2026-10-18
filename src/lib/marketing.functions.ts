@@ -86,7 +86,7 @@ Reglas:
     const content = JSON.parse(json.choices[0].message.content) as MarketingContent;
 
     const slug = content.campana.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const utm = new URL("https://becamatch-connect.lovable.app/becas");
+    const utm = new URL("https://becamatch-connect.lovable.app/");
     utm.searchParams.set("utm_source", "admin");
     utm.searchParams.set("utm_medium", data.channel);
     utm.searchParams.set("utm_campaign", slug);
