@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import {
   LayoutDashboard,
+  BotMessageSquare,
   UsersRound,
   Inbox,
   GraduationCap,
