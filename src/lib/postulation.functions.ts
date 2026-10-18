@@ -124,7 +124,7 @@ export const submitPostulation = createServerFn({ method: "POST" })
       : becas.slice(0, 3);
 
     await supabaseAdmin.from("postulation_requests")
-      .update({ ai_analysis: analysis.needs, recommended_scholarship_ids: recommended.map((b) => b.id), status: "analizada" })
+      .update({ ai_analysis: analysis.needs as import("@/integrations/supabase/types").Json, recommended_scholarship_ids: recommended.map((b) => b.id), status: "analizada" })
       .eq("id", inserted.id);
 
     const LOVABLE_API_KEY = process.env["LOVABLE_API_KEY"];
