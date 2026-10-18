@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { sendTestNotice } from "@/lib/email.functions";
-import { answer, QUICK_QUESTIONS } from "@/lib/assistant";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -118,7 +117,16 @@ function Detail() {
       </div>
 
       {current === "guardada" && <NoticeButton id={id} />}
-      <Assistant sch={sch} />
+
+      <section className="mt-8 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-lg font-semibold">Asistente de orientación</h2>
+        <p className="text-sm text-muted-foreground">
+          Pregunta sobre requisitos, elegibilidad, cobertura, fechas y documentos de esta beca. El asistente responde con los datos reales registrados.
+        </p>
+        <Button asChild className="mt-3">
+          <Link to="/asistente" search={{ beca: id }}>Consultar al asistente</Link>
+        </Button>
+      </section>
     </main>
   );
 }
@@ -149,37 +157,3 @@ function NoticeButton({ id }: { id: string }) {
   );
 }
 
-function Assistant({ sch }: { sch: Parameters<typeof answer>[0] }) {
-  const [q, setQ] = useState("");
-  const [log, setLog] = useState<{ q: string; a: string; known: boolean }[]>([]);
-  const ask = (text: string) => {
-    if (!text.trim()) return;
-    const r = answer(sch, text);
-    setLog((l) => [...l, { q: text, a: r.text, known: r.known }]);
-    setQ("");
-  };
-  return (
-    <section className="mt-8 rounded-2xl border border-border bg-card p-4">
-      <h2 className="text-lg font-semibold">Asistente de la beca</h2>
-      <p className="text-sm text-muted-foreground">Responde solo con datos registrados de esta beca.</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {QUICK_QUESTIONS.map((x) => (
-          <button key={x} onClick={() => ask(x)} className="rounded-full bg-secondary px-3 py-1 text-xs font-medium">{x}</button>
-        ))}
-      </div>
-      <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); ask(q); }}>
-        <input value={q} onChange={(e) => setQ(e.target.value)} maxLength={200} placeholder="Escribe tu pregunta…"
-          className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm" />
-        <Button type="submit" size="sm">Preguntar</Button>
-      </form>
-      <ul className="mt-3 space-y-2">
-        {log.map((m, i) => (
-          <li key={i} className="text-sm">
-            <p className="font-medium">Tú: {m.q}</p>
-            <p className={m.known ? "text-foreground" : "text-muted-foreground italic"}>Asistente: {m.a}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
