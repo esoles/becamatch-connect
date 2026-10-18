@@ -69,7 +69,7 @@ export function createResponsesCall(
           error?: { message?: string };
         } | null;
         return new Response(
-          body?.message ?? body?.error?.message ?? "Le service de IA no está disponible.",
+          body?.message ?? body?.error?.message ?? "El servicio de IA no está disponible.",
           { status: failure.status },
         );
       }

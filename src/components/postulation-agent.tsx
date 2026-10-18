@@ -37,7 +37,7 @@ const initialMessage: UIMessage = {
   parts: [
     {
       type: "text",
-      text: "Soy tu orientador de BecaMatch. ¿Qué nivel de estudios tienes actualmente y cuál te gustaría cursar?",
+      text: "Soy tu orientador de BecaMatch. ¿Qué nivel de estudios tienes actualmente?",
     },
   ],
 };

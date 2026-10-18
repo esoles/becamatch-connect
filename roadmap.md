@@ -5,7 +5,7 @@
 - [x] Verify import preservation, rules and signed-in assistant flow.
 
 # Postulation choices and agent
-- [ ] Preserve the current form and add equally prominent entry choices.
-- [ ] Add one browser-persisted conversation with live AI and profile confirmation.
-- [ ] Build plans using verified real scholarships and existing compatibility rules; email only on request.
-- [ ] Test conversation, correction, confirmation, restoration and form preservation.
+- [x] Preserve the current form and add equally prominent entry choices.
+- [x] Add one browser-persisted conversation with live AI and profile confirmation.
+- [x] Build plans using verified real scholarships and existing compatibility rules; email only on request (provider accepted the authorized test recipient).
+- [x] Test conversation, correction, confirmation, restoration and form preservation.
