@@ -6,7 +6,7 @@ import { groupApplicants, type Followup } from "./applicant-followup";
 import { aggregateMetrics, isFictionalMetricRecord, type MetricPerson } from "./admin-metrics";
 
 const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((v) => Number.isFinite(Date.parse(v)) && new Date(v).toISOString().slice(0, 10) === v);
-export const metricsRangeSchema = z.object({ from: day, to: day }).refine((r) => r.from <= r.to && Date.parse(r.to) - Date.parse(r.from) <= 365 * 86400000, "Choisissez une période de 366 jours maximum.");
+export const metricsRangeSchema = z.object({ from: day, to: day }).refine((r) => r.from <= r.to && Date.parse(r.to) - Date.parse(r.from) <= 365 * 86400000, "Selecciona un período de hasta 366 días.");
 export const getAdminMetrics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => metricsRangeSchema.parse(data))
