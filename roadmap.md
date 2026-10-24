@@ -1,9 +1,9 @@
 # Scholarship data expansion
 
 # Informed consent and privacy
-- [ ] Incorporate the uploaded demo policy, required unchecked service consent and separate optional promotional consent across signup, profile and contact/agent collection.
-- [ ] Persist version, server timestamp, identity/source and purpose; verify RLS and rejection without consent.
-- [ ] Identify legal controller/contact/provider/retention details still required before real deployment; do not claim audited compliance.
+- [x] Incorporate the uploaded demo policy at /privacidad, required unchecked service consent and separate optional email/WhatsApp consent across signup, profile and contact/agent collection. Profile can withdraw promotional choices independently of academic validation.
+- [x] Persist version, server timestamp, identity/source and purpose with transactional triggers and own-user RPCs; verified UI gating, agent creation, authenticated preference reload, owner-only RLS, rejected false consent and denied evidence writes; 11 tests passed. Existing conversations require affirmative renewal, not backfilled consent. OAuth external provider flow and signup email confirmation were not exercised.
+- [ ] Real legal notice and readiness: blocked on controller identity/address, operational rights contact, bank registration, retention periods, transfers/processor review and verified minor/guardian procedure; uploaded notice is explicitly demo and not a compliance claim.
 
 # Scholarship questions in the postulation agent
 - [x] Add name-based catalog lookup and contextual answers with recorded dates, requirements and provenance; preserve profile confirmation and the existing form.

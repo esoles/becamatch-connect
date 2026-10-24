@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-import { consentSchema } from "./privacy";
+import { consentSchema, PRIVACY_VERSION } from "./privacy";
 import type { z } from "zod";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -14,15 +14,16 @@ export async function verifiedIdentity(accessToken?: string) {
   const { data, error } = await db.auth.getUser(accessToken);
   return !error && data.user?.email_confirmed_at ? data.user.id : null;
 }
-export async function openConversation(credential: ResumeCredential) {
+export async function openConversation(credential: ResumeCredential, renewingConsent = false) {
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const { data, error } = await db
     .from("web_agent_conversations")
-    .select("id,user_id,status")
+    .select("id,user_id,status,privacy_version,privacy_accepted")
     .eq("id", credential.conversationId)
     .eq("resume_token_hash", await hash(credential.resumeToken))
     .maybeSingle();
   if (error || !data) throw new Error("No se puede acceder a esta conversación.");
+  if (!renewingConsent && (!data.privacy_accepted || data.privacy_version !== PRIVACY_VERSION)) throw new Error("Confirma la Política de Privacidad antes de continuar.");
   return { db, conversation: data };
 }
 export async function createConversation(accessToken: string | undefined, consent: z.infer<typeof consentSchema>) {
