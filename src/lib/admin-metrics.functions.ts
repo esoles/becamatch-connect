@@ -3,14 +3,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { loadInteractions } from "./interaction-inbox.server";
 import { groupApplicants, type Followup } from "./applicant-followup";
-import { aggregateMetrics, isFictionalMetricRecord, type MetricPerson } from "./admin-metrics";
+import { aggregateMetrics, includesMetricIdentity, isFictionalMetricRecord, type MetricPerson } from "./admin-metrics";
 
 const day = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/)
   .refine((v) => Number.isFinite(Date.parse(v)) && new Date(v).toISOString().slice(0, 10) === v);
 export const metricsRangeSchema = z
-  .object({ from: day, to: day })
+  .object({ from: day, to: day, source: z.enum(["real", "prueba"]).default("real") })
   .refine(
     (r) => r.from <= r.to && Date.parse(r.to) - Date.parse(r.from) <= 365 * 86400000,
     "Selecciona un período de hasta 366 días.",
@@ -98,23 +98,25 @@ export const getAdminMetrics = createServerFn({ method: "POST" })
       }
       return key;
     };
-    const excluded = new Set<string>(roles.map((r) => resolve(`user:${r.user_id}`)));
+    const admins = new Set<string>(roles.map((r) => resolve(`user:${r.user_id}`)));
+    const fictional = new Set<string>();
     for (const f of followups)
-      if (isFictionalMetricRecord(f.objective)) excluded.add(resolve(f.person_key));
+      if (isFictionalMetricRecord(f.objective)) fictional.add(resolve(f.person_key));
     for (const p of profiles)
-      if (isFictionalMetricRecord(p.full_name)) excluded.add(resolve(`user:${p.id}`));
+      if (isFictionalMetricRecord(p.full_name)) fictional.add(resolve(`user:${p.id}`));
+    for (const r of rawInteractions)
+      if (isFictionalMetricRecord(r.title) || isFictionalMetricRecord(r.requestText ?? ""))
+        fictional.add(resolve(r.userId ? `user:${r.userId}` : r.key));
+    for (const c of calls)
+      if (isFictionalMetricRecord(c.full_name) || isFictionalMetricRecord(c.notes))
+        fictional.add(resolve(c.user_id ? `user:${c.user_id}` : `call:${c.id}`));
+    const include = (key: string) => includesMetricIdentity(resolve(key), fictional, admins, data.source);
     const interactions = rawInteractions.filter(
-      (r) =>
-        !isFictionalMetricRecord(r.title) &&
-        !isFictionalMetricRecord(r.requestText ?? "") &&
-        !excluded.has(resolve(r.userId ? `user:${r.userId}` : r.key)),
+      (r) => include(r.userId ? `user:${r.userId}` : r.key),
     );
-    const realProfiles = profiles.filter((p) => !excluded.has(resolve(`user:${p.id}`)));
+    const realProfiles = profiles.filter((p) => include(`user:${p.id}`));
     const realCalls = calls.filter(
-      (c) =>
-        !isFictionalMetricRecord(c.full_name) &&
-        !isFictionalMetricRecord(c.notes) &&
-        !excluded.has(resolve(c.user_id ? `user:${c.user_id}` : `call:${c.id}`)),
+      (c) => include(c.user_id ? `user:${c.user_id}` : `call:${c.id}`),
     );
     const saved = decisions.flatMap((d) => {
       const s = scholarships.find(
@@ -174,6 +176,7 @@ export const getAdminMetrics = createServerFn({ method: "POST" })
     return {
       ...aggregateMetrics(people, events, data),
       range: data,
+      source: data.source,
       generatedAt: new Date().toISOString(),
     };
   });

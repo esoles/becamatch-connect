@@ -13,6 +13,7 @@ import { getAdminMetrics, metricsRangeSchema } from "@/lib/admin-metrics.functio
 import { quickRange, limaDay, PRIORITY_THRESHOLD, type MetricsRange } from "@/lib/admin-metrics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ChartContainer,
   ChartTooltip,
@@ -28,9 +29,9 @@ const metricsQuery = (range: MetricsRange) =>
     staleTime: 30000,
   });
 export const Route = createFileRoute("/admin/metricas")({
-  validateSearch: (search): MetricsRange => {
+  validateSearch: (search) => {
     const parsed = metricsRangeSchema.safeParse(search);
-    return parsed.success ? parsed.data : quickRange("current", Date.now());
+    return parsed.success ? parsed.data : { ...quickRange("current", Date.now()), source: "prueba" as const };
   },
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) => context.queryClient.ensureQueryData(metricsQuery(deps)),
@@ -81,7 +82,7 @@ function MetricsPage() {
   const { data } = useSuspenseQuery(metricsQuery(range));
   const router = useRouter();
   const setRange = (next: MetricsRange) => {
-    if (metricsRangeSchema.safeParse(next).success) void navigate({ search: next });
+    if (metricsRangeSchema.safeParse(next).success) void navigate({ search: { ...next, source: range.source } });
   };
   const today = limaDay(Date.now());
   const exactToday = range.from === today && range.to === today;
@@ -128,7 +129,7 @@ function MetricsPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="mb-2 text-xs uppercase text-muted-foreground">Seguimiento real</p>
+          <p className="mb-2 text-xs uppercase text-muted-foreground">{data.source === "prueba" ? "Datos de prueba" : "Seguimiento real"}</p>
           <h2 className="text-3xl font-semibold">Métricas de BecaMatch</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             {range.from} — {range.to} · Hora de Lima (UTC−5)
@@ -144,6 +145,19 @@ function MetricsPage() {
           <RefreshCw />
         </Button>
       </div>
+      <Tabs value={range.source} onValueChange={(source) => {
+        if (source === "real" || source === "prueba") void navigate({ search: { ...range, source } });
+      }}>
+        <TabsList aria-label="Origen de las métricas">
+          <TabsTrigger value="real">Datos reales</TabsTrigger>
+          <TabsTrigger value="prueba">Datos de prueba</TabsTrigger>
+        </TabsList>
+      </Tabs>
+      {data.source === "prueba" && (
+        <p role="status" className="border-l-2 border-accent px-4 py-2 text-sm text-muted-foreground">
+          Casos ficticios para demostración. No representan postulaciones, mensajes ni resultados reales.
+        </p>
+      )}
       <section
         aria-label="Filtro de fechas"
         className="flex flex-wrap items-end gap-4 border-y border-border py-5"
@@ -216,7 +230,7 @@ function MetricsPage() {
         <section className="min-w-0 border-t border-border pt-5">
           <h3 className="text-lg font-semibold">Leads por canal y día</h3>
           <p className="mt-1 mb-5 text-xs text-muted-foreground">
-            Canal del primer contacto registrado · una persona, un origen
+            {data.source === "prueba" ? "Origen de los casos ficticios" : "Canal del primer contacto registrado"} · una persona, un origen
           </p>
           {data.channels.length ? (
             <ChartContainer className="h-72 w-full aspect-auto" config={config}>
@@ -308,8 +322,9 @@ function MetricsPage() {
             entrega. Sin datos atribuidos de Instagram o Facebook.
           </p>
           <p>
-            Se excluyen registros explícitamente etiquetados como prueba, ficticios o demostración y
-            cuentas administrativas. Los registros de prueba sin etiqueta no se pueden identificar
+            Datos reales excluye registros etiquetados como prueba, ficticios o demostración;
+            Datos de prueba muestra únicamente esos casos. Ambas vistas excluyen cuentas
+            administrativas. Los registros de prueba sin etiqueta no se pueden identificar
             automáticamente. Rango máximo: 366 días. Actualizado:{" "}
             {new Date(data.generatedAt).toLocaleString("es-PE", { timeZone: "America/Lima" })}.
           </p>

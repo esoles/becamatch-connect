@@ -4,6 +4,7 @@ import {
   limaDay,
   quickRange,
   isFictionalMetricRecord,
+  includesMetricIdentity,
   type MetricPerson,
 } from "./admin-metrics";
 const range = { from: "2026-10-01", to: "2026-10-24" };
@@ -15,6 +16,30 @@ const person: MetricPerson = {
   priority: 60,
 };
 describe("real administrative metrics", () => {
+  it("isolates test identities from real metrics and excludes admins in both views", () => {
+    const fictional = new Set(["test", "admin"]);
+    const admins = new Set(["admin"]);
+    expect(includesMetricIdentity("test", fictional, admins, "real")).toBe(false);
+    expect(includesMetricIdentity("test", fictional, admins, "prueba")).toBe(true);
+    expect(includesMetricIdentity("real", fictional, admins, "prueba")).toBe(false);
+    expect(includesMetricIdentity("real", fictional, admins, "real")).toBe(true);
+    expect(includesMetricIdentity("admin", fictional, admins, "real")).toBe(false);
+    expect(includesMetricIdentity("admin", fictional, admins, "prueba")).toBe(false);
+  });
+  it("current-month examples populate every stage and exclude last-month examples", () => {
+    const stages = ["nuevo", "contactado", "preparando", "postulado", "seguimiento", "ganado", "perdido"] as const;
+    const examples = stages.flatMap((stage, i) => Array.from({ length: 3 }, (_, j) => ({
+      key: `test:${i}:${j}`, createdAt: `2026-10-${String(i * 3 + j + 1).padStart(2, "0")}T17:00:00Z`,
+      channel: "Formulario", stage, priority: stage === "preparando" ? 60 : 30,
+    })));
+    const events = examples.filter((p) => ["postulado", "seguimiento", "ganado"].includes(p.stage))
+      .map((p) => ({ key: p.key, date: "2026-10-24T06:00:00Z" }));
+    const m = aggregateMetrics([...examples, { ...person, key: "previous", createdAt: "2026-09-30T17:00:00Z" }], events, quickRange("current", Date.parse("2026-10-24T06:00:00Z")));
+    expect(m.leads).toBe(21);
+    expect(m.submissions).toBe(9);
+    expect(m.converted).toBe(9);
+    expect(m.funnel.map((s) => s.count)).toEqual([3, 3, 3, 3, 3, 3, 3]);
+  });
   it("uses Lima midnight not UTC midnight", () => {
     expect(limaDay("2026-10-24T04:59:59Z")).toBe("2026-10-23");
     expect(limaDay("2026-10-24T05:00:00Z")).toBe("2026-10-24");
