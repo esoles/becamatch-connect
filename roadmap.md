@@ -1,5 +1,9 @@
 # Scholarship data expansion
 
+# Named demonstration plans
+- [ ] Enable explicitly confirmed demo plans for named example scholarships in /postular, keeping real plans isolated.
+- [ ] Verify Beca Intercambio Pacífico plan generation, persistence and privacy; provide matching input data.
+
 # Informed consent and privacy
 - [x] Incorporate the uploaded demo policy at /privacidad, required unchecked service consent and separate optional email/WhatsApp consent across signup, profile and contact/agent collection. Profile can withdraw promotional choices independently of academic validation.
 - [x] Persist version, server timestamp, identity/source and purpose with transactional triggers and own-user RPCs; verified UI gating, agent creation, authenticated preference reload, owner-only RLS, rejected false consent and denied evidence writes; 11 tests passed. Existing conversations require affirmative renewal, not backfilled consent. OAuth external provider flow and signup email confirmation were not exercised.
