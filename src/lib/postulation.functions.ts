@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { consentSchema } from "./privacy";
 
 const inputSchema = z.object({
+  consent: consentSchema,
   fullName: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(200),
   requestText: z.string().trim().min(20).max(2000),
@@ -104,6 +106,8 @@ export const submitPostulation = createServerFn({ method: "POST" })
         email: data.email,
         request_text: data.requestText,
         status: "recibida",
+        privacy_version: data.consent.policyVersion, privacy_accepted: data.consent.legal,
+        promotions_email: data.consent.emailPromotions, promotions_whatsapp: data.consent.whatsappPromotions,
         user_id: userId,
       })
       .select("id")

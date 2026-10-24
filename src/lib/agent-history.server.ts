@@ -1,4 +1,6 @@
 import type { UIMessage } from "ai";
+import { consentSchema } from "./privacy";
+import type { z } from "zod";
 import type { Json } from "@/integrations/supabase/types";
 
 export type ResumeCredential = { conversationId: string; resumeToken: string };
@@ -23,7 +25,8 @@ export async function openConversation(credential: ResumeCredential) {
   if (error || !data) throw new Error("No se puede acceder a esta conversación.");
   return { db, conversation: data };
 }
-export async function createConversation(accessToken?: string) {
+export async function createConversation(accessToken: string | undefined, consent: z.infer<typeof consentSchema>) {
+  consentSchema.parse(consent);
   const resumeToken = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
     b.toString(16).padStart(2, "0"),
   ).join("");
@@ -33,6 +36,8 @@ export async function createConversation(accessToken?: string) {
     .insert({
       resume_token_hash: await hash(resumeToken),
       user_id: await verifiedIdentity(accessToken),
+      privacy_version: consent.policyVersion, privacy_accepted: consent.legal,
+      promotions_email: consent.emailPromotions, promotions_whatsapp: consent.whatsappPromotions,
     })
     .select("id")
     .single();

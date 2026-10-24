@@ -7,6 +7,8 @@ import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PrivacyConsent } from "@/components/privacy-consent";
+import { consentPayload, emptyConsent, PRIVACY_VERSION } from "@/lib/privacy";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { mode?: "login"; next?: "admin" } => ({
@@ -55,6 +57,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [consent, setConsent] = useState({ ...emptyConsent });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,6 +72,8 @@ function AuthPage() {
   }, [next, navigate]);
 
   async function google() {
+    if (!isLogin && !consent.legal) { toast.error("Autoriza el tratamiento de datos antes de continuar."); return; }
+    if (!isLogin) sessionStorage.setItem("signup_privacy", JSON.stringify(consentPayload(consent)));
     setLoading(true);
     const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth` });
     if (r.redirected) return;
@@ -81,6 +86,7 @@ function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!isLogin && !consent.legal) { toast.error("Autoriza el tratamiento de datos antes de crear tu cuenta."); return; }
     const parsed = schema.safeParse({ email, password });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setLoading(true);
@@ -94,7 +100,7 @@ function AuthPage() {
     } else {
       const { data, error } = await supabase.auth.signUp({
         ...parsed.data,
-        options: { emailRedirectTo: `${window.location.origin}${to === "/admin" ? "/perfil" : to}` },
+        options: { data: { privacy_version: PRIVACY_VERSION, privacy_accepted: true, promotions_email: consent.emailPromotions, promotions_whatsapp: consent.whatsappPromotions }, emailRedirectTo: `${window.location.origin}${to === "/admin" ? "/perfil" : to}` },
       });
       setLoading(false);
       if (error) { toast.error(error.message); return; }
@@ -125,12 +131,13 @@ function AuthPage() {
                 <Label htmlFor="pw">Contraseña</Label>
                 <Input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
-              <Button type="submit" className="h-11 w-full rounded-full" disabled={loading}>
+              {!isLogin && <PrivacyConsent value={consent} onChange={setConsent} id="signup" />}
+              <Button type="submit" className="h-11 w-full rounded-full" disabled={loading || (!isLogin && !consent.legal)}>
                 {loading ? "Un momento…" : isLogin ? "Ingresar" : "Crear cuenta"}
               </Button>
             </form>
             <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />o<span className="h-px flex-1 bg-border" /></div>
-            <Button type="button" variant="outline" className="h-11 w-full rounded-full" disabled={loading} onClick={google}>
+            <Button type="button" variant="outline" className="h-11 w-full rounded-full" disabled={loading || (!isLogin && !consent.legal)} onClick={google}>
               Continuar con Google
             </Button>
             <button className="mt-4 w-full text-center text-sm text-muted-foreground underline" onClick={() => setIsLogin(!isLogin)}>

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { UIMessage } from "ai";
+import { consentSchema } from "./privacy";
 import type { AgentPlan } from "./postulation-agent";
 
 export const resumeSchema = z.object({
@@ -8,10 +9,10 @@ export const resumeSchema = z.object({
   resumeToken: z.string().regex(/^[a-f0-9]{64}$/),
 });
 export const startAgentConversation = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ accessToken: z.string().max(5000).optional() }).parse(d))
+  .inputValidator((d) => z.object({ accessToken: z.string().max(5000).optional(), consent: consentSchema }).parse(d))
   .handler(async ({ data }) => {
     const { createConversation } = await import("./agent-history.server");
-    return createConversation(data.accessToken);
+    return createConversation(data.accessToken, data.consent);
   });
 export const restoreAgentConversation = createServerFn({ method: "POST" })
   .inputValidator((d) => resumeSchema.parse(d))
