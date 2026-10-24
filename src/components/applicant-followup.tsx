@@ -11,6 +11,8 @@ import {
   overdue,
   evaluatePriority,
   recentApplicantsFirst,
+  postulationDates,
+  inPostulationRange,
   type Applicant,
   type Stage,
 } from "@/lib/applicant-followup";
@@ -25,6 +27,13 @@ const fmt = (s: string | null) =>
     ? new Date(s).toLocaleString("es-PE", {
         dateStyle: "short",
         timeStyle: "short",
+        timeZone: "America/Lima",
+      })
+    : "—";
+const fmtDay = (s: string | null) =>
+  s
+    ? new Date(s).toLocaleDateString("es-PE", {
+        dateStyle: "medium",
         timeZone: "America/Lima",
       })
     : "—";
@@ -60,7 +69,9 @@ export function ApplicantFollowupView({
     [stage, setStage] = useState("todos"),
     [assignee, setAssignee] = useState("todos"),
     [alert, setAlert] = useState("todos"),
-    [order, setOrder] = useState("activity");
+    [order, setOrder] = useState("activity"),
+    [from, setFrom] = useState(""),
+    [to, setTo] = useState("");
   const [selected, setSelected] = useState<string | null>(null),
     [calling, setCalling] = useState(false);
   const evaluated = people.map((p) => ({ ...p, ...evaluatePriority(p, now) }));
@@ -68,6 +79,7 @@ export function ApplicantFollowupView({
     .filter(
       (p) =>
         (!query || `${p.name} ${p.key}`.toLowerCase().includes(query.trim().toLowerCase())) &&
+        inPostulationRange(postulationDates(p), from, to) &&
         (channel === "todos" || p.channels.includes(channel)) &&
         (stage === "todos" || p.followup.stage === stage) &&
         (assignee === "todos" ||
@@ -198,9 +210,42 @@ export function ApplicantFollowupView({
           <option value="date">Fecha de seguimiento</option>
           <option value="pending">Antigüedad pendiente</option>
         </select>
+        <label className="grid gap-1 text-xs text-muted-foreground">
+          Fecha de postulación desde
+          <Input
+            aria-label="Fecha de postulación desde"
+            type="date"
+            max={to || undefined}
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+          />
+        </label>
+        <label className="grid gap-1 text-xs text-muted-foreground">
+          Fecha de postulación hasta
+          <Input
+            aria-label="Fecha de postulación hasta"
+            type="date"
+            min={from || undefined}
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+          />
+        </label>
+        {(from || to) && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="self-end"
+            onClick={() => {
+              setFrom("");
+              setTo("");
+            }}
+          >
+            Quitar rango de fechas
+          </Button>
+        )}
       </div>
       <div className="overflow-x-auto border-y border-border">
-        <table className="w-full min-w-[980px] text-left text-sm">
+        <table className="w-full min-w-[1120px] text-left text-sm">
           <thead className="bg-secondary">
             <tr>
               {[
@@ -208,6 +253,7 @@ export function ApplicantFollowupView({
                 "Canales",
                 "Prioridad",
                 "Etapa",
+                "Fecha de postulación",
                 "Última interacción",
                 "Próxima acción",
                 "Fecha de seguimiento",
@@ -244,6 +290,16 @@ export function ApplicantFollowupView({
                   </span>
                 </td>
                 <td className="px-3 py-3">{stages[p.followup.stage]}</td>
+                <td
+                  className="whitespace-nowrap px-3 py-3 text-xs"
+                  title={
+                    postulationDates(p).length > 1
+                      ? `${postulationDates(p).length} postulaciones registradas`
+                      : undefined
+                  }
+                >
+                  {fmtDay(postulationDates(p).at(-1) ?? null)}
+                </td>
                 <td className="whitespace-nowrap px-3 py-3 text-xs">{fmt(p.lastActivity)}</td>
                 <td className="max-w-56 px-3 py-3 text-xs">
                   {p.followup.next_action || (
@@ -279,6 +335,11 @@ export function ApplicantFollowupView({
         <p className="mt-2">
           Las respuestas de WhatsApp sin confirmación de entrega y los correos aceptados sin entrega
           comprobada conservan estado desconocido. No se envían mensajes desde esta vista.
+        </p>
+        <p className="mt-2">
+          Fecha de postulación: fecha del formulario «Quiero postular» enviado o del plan de
+          postulación registrado. El rango es inclusivo y se compara por día calendario de Lima
+          (UTC-5). Las fichas sin postulación registrada quedan fuera cuando hay un rango activo.
         </p>
       </details>
       {person && (
