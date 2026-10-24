@@ -43,6 +43,13 @@ const scholarship: PlanScholarship = {
   proceso_postulacion: ["Official step"],
 };
 describe("secure application plan", () => {
+  it("preserves demo provenance in the private-free shared snapshot", () => {
+    const demo = { ...scholarship, es_demo: true, deadline: "2027-01-10" };
+    const output = shareablePlan(makeAgentPlan(profile, [demo], "2026-10-24", { mode: "demo", scholarshipName: demo.name }));
+    expect(output.demo).toBe(true);
+    expect(output.opportunities[0]?.orientation.illustrative).toBe(true);
+    expect(JSON.stringify(output)).not.toContain("Private");
+  });
   it("shares scholarship facts without private profile fields", () => {
     const output = shareablePlan(makeAgentPlan(profile, [scholarship], "2026-10-18"));
     expect(JSON.stringify(output)).not.toContain("Private");

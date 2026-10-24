@@ -114,7 +114,8 @@ export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[],
     ],
   };
 }
-export type AgentPlan = ReturnType<typeof makeAgentPlan> & {
+export type AgentPlan = Omit<ReturnType<typeof makeAgentPlan>, "demo"> & {
+  demo?: boolean;
   planNumber?: string | undefined;
   shareId?: string | undefined;
   shareUrl?: string | undefined;
