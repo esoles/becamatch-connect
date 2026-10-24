@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PostularRouteImport } from './routes/postular'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as AuthenticatedAsistenteRouteImport } from './routes/_authenticated/asistente'
 import { Route as AuthenticatedMazoRouteImport } from './routes/_authenticated/mazo'
 import { Route as AuthenticatedMisBecasRouteImport } from './routes/_authenticated/mis-becas'
@@ -56,6 +57,11 @@ const AuthRoute = AuthRouteImport.update({
 const PostularRoute = PostularRouteImport.update({
   id: '/postular',
   path: '/postular',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAsistenteRoute = AuthenticatedAsistenteRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/postular': typeof PostularRoute
+  '/privacidad': typeof PrivacidadRoute
   '/asistente': typeof AuthenticatedAsistenteRoute
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/postular': typeof PostularRoute
+  '/privacidad': typeof PrivacidadRoute
   '/asistente': typeof AuthenticatedAsistenteRoute
   '/mazo': typeof AuthenticatedMazoRoute
   '/mis-becas': typeof AuthenticatedMisBecasRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/postular': typeof PostularRoute
+  '/privacidad': typeof PrivacidadRoute
   '/_authenticated/asistente': typeof AuthenticatedAsistenteRoute
   '/_authenticated/mazo': typeof AuthenticatedMazoRoute
   '/_authenticated/mis-becas': typeof AuthenticatedMisBecasRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/postular'
+    | '/privacidad'
     | '/asistente'
     | '/mazo'
     | '/mis-becas'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/postular'
+    | '/privacidad'
     | '/asistente'
     | '/mazo'
     | '/mis-becas'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/postular'
+    | '/privacidad'
     | '/_authenticated/asistente'
     | '/_authenticated/mazo'
     | '/_authenticated/mis-becas'
@@ -315,6 +327,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   PostularRoute: typeof PostularRoute
+  PrivacidadRoute: typeof PrivacidadRoute
   PlanIdRoute: typeof PlanIdRoute
   WhatsappVincularRoute: typeof WhatsappVincularRoute
   ApiPublicPostulationAgentRoute: typeof ApiPublicPostulationAgentRoute
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/postular'
       fullPath: '/postular'
       preLoaderRoute: typeof PostularRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/asistente': {
@@ -549,6 +569,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   PostularRoute: PostularRoute,
+  PrivacidadRoute: PrivacidadRoute,
   PlanIdRoute: PlanIdRoute,
   WhatsappVincularRoute: WhatsappVincularRoute,
   ApiPublicPostulationAgentRoute: ApiPublicPostulationAgentRoute,
