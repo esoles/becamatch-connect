@@ -47,6 +47,38 @@ const DAY = 86400000;
 export function recentApplicantsFirst(a: Pick<Applicant, "lastActivity" | "key">, b: Pick<Applicant, "lastActivity" | "key">) {
   return (b.lastActivity ?? "").localeCompare(a.lastActivity ?? "") || a.key.localeCompare(b.key);
 }
+const FOLLOWUP_ZONE = "America/Lima";
+/** Calendar day in Lima (UTC-5) of an instant, used for inclusive date-range filters. */
+export function postulationDay(date: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: FOLLOWUP_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(date));
+}
+/**
+ * Dates on which this person actually postulated: a submitted "Quiero postular"
+ * form, or a saved application plan coming from any channel. Records without
+ * either evidence have no postulation date; nothing is inferred from profile
+ * creation or generic activity.
+ */
+export function postulationDates(p: Pick<Applicant, "interactions">) {
+  return [...new Set(
+    p.interactions.flatMap((r) =>
+      r.channel === "Formulario"
+        ? [r.incomingAt ?? r.lastActivity]
+        : r.plans.map((plan) => plan.date),
+    ),
+  )].sort();
+}
+export function inPostulationRange(dates: string[], from: string, to: string) {
+  if (!from && !to) return true;
+  return dates.some((date) => {
+    const day = postulationDay(date);
+    return (!from || day >= from) && (!to || day <= to);
+  });
+}
 export function responseState(interactions: InboxInteraction[], calls: Call[], f: Followup) {
   if (f.stage === "ganado" || f.stage === "perdido")
     return { response: "answered" as const, pendingSince: null };

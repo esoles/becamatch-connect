@@ -1,3 +1,8 @@
+# Postulation date range in admin applicants
+
+- [x] Add inclusive "Fecha de postulación" from/to filter and column to /admin/postulantes; a postulation date comes only from a submitted «Quiero postular» form or a saved application plan, compared on Lima calendar days.
+- [x] Verify live: 42 fichas total, 10 on 2026-10-18, 2 on 2026-10-17 (a 02:51 UTC record correctly falls on the 17th in Lima), 0 in September, 5 in the 10-10..10-14 range, and the clear button restores all rows; 19 follow-up tests and build OK.
+
 # Scholarship data expansion
 
 # Named demonstration plans
