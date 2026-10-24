@@ -1,8 +1,8 @@
 # Scholarship data expansion
 
 # Named demonstration plans
-- [ ] Enable explicitly confirmed demo plans for named example scholarships in /postular, keeping real plans isolated.
-- [ ] Verify Beca Intercambio Pacífico plan generation, persistence and privacy; provide matching input data.
+- [x] Enable explicitly confirmed demo plans for named example scholarships in /postular, keeping real plans isolated and retaining example provenance and links.
+- [x] Verified 25 tests and live IA conversation, confirmed Beca Intercambio Pacífico plan BM-2026-0009 at 100/100, saved snapshot privacy, public page and reload. Matching test profile: pregrado, Ingeniería de Sistemas, 16/20, inglés B1, Japón, 2027.
 
 # Informed consent and privacy
 - [x] Incorporate the uploaded demo policy at /privacidad, required unchecked service consent and separate optional email/WhatsApp consent across signup, profile and contact/agent collection. Profile can withdraw promotional choices independently of academic validation.
