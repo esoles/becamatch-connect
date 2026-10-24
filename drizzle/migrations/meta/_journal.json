@@ -120,6 +120,13 @@
       "when": 1792878782275,
       "tag": "0016_informed_privacy_consent",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792878905322,
+      "tag": "0017_privacy_conversation_renewal_and_preferences",
+      "breakpoints": true
     }
   ]
 }

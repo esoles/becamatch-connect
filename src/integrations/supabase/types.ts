@@ -732,6 +732,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_my_promotional_preferences: {
+        Args: { email_promotions: boolean; whatsapp_promotions: boolean }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "student"

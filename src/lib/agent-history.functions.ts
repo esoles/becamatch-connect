@@ -15,10 +15,12 @@ export const startAgentConversation = createServerFn({ method: "POST" })
     return createConversation(data.accessToken, data.consent);
   });
 export const restoreAgentConversation = createServerFn({ method: "POST" })
-  .inputValidator((d) => resumeSchema.parse(d))
+  .inputValidator((d) => resumeSchema.extend({ consent: consentSchema }).parse(d))
   .handler(async ({ data }) => {
     const { openConversation } = await import("./agent-history.server");
     const { db } = await openConversation(data);
+    const renewed = await db.from("web_agent_conversations").update({ privacy_version: data.consent.policyVersion, privacy_accepted: true, promotions_email: data.consent.emailPromotions, promotions_whatsapp: data.consent.whatsappPromotions }).eq("id", data.conversationId);
+    if (renewed.error) throw new Error("No se pudo registrar el consentimiento.");
     const [messages, plans] = await Promise.all([
       db
         .from("web_agent_messages")
