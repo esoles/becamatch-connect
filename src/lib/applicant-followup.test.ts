@@ -249,7 +249,7 @@ describe("applicant follow-up rules", () => {
   it("a person without form or plan evidence has no postulation date", () =>
     expect(
       postulationDates({
-        interactions: [{ ...form, channel: "Agente web" as const, incomingAt: undefined }],
+        interactions: [{ ...form, channel: "Agente web" as const }],
       }),
     ).toEqual([]));
 });
