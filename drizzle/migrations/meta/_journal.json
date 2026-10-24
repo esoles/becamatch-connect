@@ -127,6 +127,13 @@
       "when": 1792878905322,
       "tag": "0017_privacy_conversation_renewal_and_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792879026649,
+      "tag": "0018_lock_consent_evidence_privileges",
+      "breakpoints": true
     }
   ]
 }
