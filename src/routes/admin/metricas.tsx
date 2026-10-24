@@ -49,7 +49,7 @@ function MetricsPage() {
     { title: "Postulaciones por interesado", value: data.average.toLocaleString("es-PE", { maximumFractionDigits: 2 }), detail: "Promedio de la cohorte seleccionada", icon: ChartNoAxesCombined },
     { title: "Tasa de conversión", value: `${data.conversion.toLocaleString("es-PE", { maximumFractionDigits: 1 })}%`, detail: `${data.converted} avanzados / ${data.leads} leads`, icon: TrendingUp },
   ];
-  const config = Object.fromEntries(data.channels.map((channel, i) => [channel, { label: channel, color: colors[i % colors.length] }]));
+  const config = Object.fromEntries(data.channels.map((channel, i) => [channel, { label: channel, color: colors[i % colors.length] ?? "var(--primary)" }]));
   return <div className="space-y-8">
     <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="mb-2 text-xs uppercase text-muted-foreground">Seguimiento real</p><h2 className="text-3xl font-semibold">Métricas de BecaMatch</h2><p className="mt-2 text-sm text-muted-foreground">{range.from} — {range.to} · Hora de Lima (UTC−5)</p></div><Button variant="outline" size="icon" aria-label="Actualizar métricas" title="Actualizar métricas" onClick={() => router.invalidate()}><RefreshCw /></Button></div>
     <section aria-label="Filtro de fechas" className="flex flex-wrap items-end gap-4 border-y border-border py-5">
