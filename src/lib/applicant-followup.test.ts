@@ -4,6 +4,9 @@ import {
   recentApplicantsFirst,
   groupApplicants,
   overdue,
+  postulationDates,
+  postulationDay,
+  inPostulationRange,
   responseState,
   type Followup,
 } from "./applicant-followup";
@@ -221,4 +224,32 @@ describe("applicant follow-up rules", () => {
       "web:b",
     ]);
   });
+  it("postulation dates come only from submitted forms and saved plans", () => {
+    const plan = { date: "2026-10-12T09:00:00Z", plan: { opportunities: [] } as never };
+    expect(
+      postulationDates({
+        interactions: [
+          { ...form, incomingAt: "2026-10-18T09:00:00Z" },
+          { ...form, key: "web:b", channel: "Agente web" as const, plans: [plan] },
+          { ...form, key: "wa:c", channel: "WhatsApp" as const },
+        ],
+      }),
+    ).toEqual(["2026-10-12T09:00:00Z", "2026-10-18T09:00:00Z"]);
+  });
+  it("date range is inclusive and compared on Lima calendar days", () => {
+    const dates = postulationDates({
+      interactions: [{ ...form, incomingAt: "2026-10-19T02:00:00Z" }],
+    });
+    expect(postulationDay("2026-10-19T02:00:00Z")).toBe("2026-10-18");
+    expect(inPostulationRange(dates, "2026-10-18", "2026-10-18")).toBe(true);
+    expect(inPostulationRange(dates, "2026-10-19", "2026-10-19")).toBe(false);
+    expect(inPostulationRange(dates, "", "")).toBe(true);
+    expect(inPostulationRange(dates, "2026-10-19", "")).toBe(false);
+  });
+  it("a person without form or plan evidence has no postulation date", () =>
+    expect(
+      postulationDates({
+        interactions: [{ ...form, channel: "Agente web" as const, incomingAt: undefined }],
+      }),
+    ).toEqual([]));
 });
