@@ -64,6 +64,7 @@ export function createResponsesCall(
       const response = await withLovableAiGatewayRunIdHeader(
         result.toUIMessageStreamResponse({
           originalMessages,
+          generateMessageId: () => crypto.randomUUID(),
           sendReasoning: true,
           onFinish: onFinish ?? (() => {}),
           onError: (error) =>
