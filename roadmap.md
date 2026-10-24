@@ -1,5 +1,10 @@
 # Scholarship data expansion
 
+# Informed consent and privacy
+- [ ] Incorporate the uploaded demo policy, required unchecked service consent and separate optional promotional consent across signup, profile and contact/agent collection.
+- [ ] Persist version, server timestamp, identity/source and purpose; verify RLS and rejection without consent.
+- [ ] Identify legal controller/contact/provider/retention details still required before real deployment; do not claim audited compliance.
+
 # Scholarship questions in the postulation agent
 - [x] Add name-based catalog lookup and contextual answers with recorded dates, requirements and provenance; preserve profile confirmation and the existing form.
 - [x] Pass 14 matching/provenance/plan tests and real agent lookup plus contextual document follow-up and reload; fix empty assistant message IDs so both responses persist. Build OK.
