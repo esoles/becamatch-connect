@@ -113,6 +113,13 @@
       "when": 1792341174357,
       "tag": "0015_allow_submitted_applicant_stage",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792878782275,
+      "tag": "0016_informed_privacy_consent",
+      "breakpoints": true
     }
   ]
 }
