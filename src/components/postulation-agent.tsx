@@ -24,9 +24,11 @@ import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-e
 import {
   AGENT_STORAGE_KEY,
   agentProfileSchema,
+  agentPlanOptionsSchema,
   profileLabels,
   type AgentProfile,
   type AgentPlan,
+  type AgentPlanOptions,
 } from "@/lib/postulation-agent";
 import { generateAgentPlan, emailAgentPlan } from "@/lib/postulation-agent.functions";
 import { startAgentConversation, restoreAgentConversation } from "@/lib/agent-history.functions";
@@ -176,6 +178,7 @@ function AgentConversation({
   }, [busy]);
 
   let profile: AgentProfile | null = null;
+  let planOptions: AgentPlanOptions = { mode: "real", scholarshipName: null };
   for (const message of messages)
     for (const part of message.parts) {
       if (message.role === "user") profile = null;
@@ -184,9 +187,11 @@ function AgentConversation({
         part.type === "tool-prepare_profile" &&
         part.state === "output-available"
       ) {
-        const output = part.output as { profile?: unknown };
+        const output = part.output as { profile?: unknown; options?: unknown };
         const parsed = agentProfileSchema.safeParse(output.profile);
         if (parsed.success) profile = parsed.data;
+        const options = agentPlanOptionsSchema.safeParse(output.options);
+        if (options.success) planOptions = options.data;
       }
     }
   const confirm = async () => {
@@ -198,6 +203,7 @@ function AgentConversation({
         await generate({
           data: {
             profile,
+            options: planOptions,
             confirmed: true,
             conversationId: initial.conversationId,
             resumeToken: initial.resumeToken,
@@ -331,10 +337,11 @@ function AgentConversation({
       {profile && !plan && !busy && (
         <section className="mt-8 border-t border-border pt-6">
           <h2 className="mb-3 text-xl font-semibold">Revisa tu perfil</h2>
+          {planOptions.mode === "demo" && <p className="mb-3 font-semibold text-primary">Plan de demostración · {planOptions.scholarshipName}</p>}
           <ProfileSummary profile={profile} />
           <div className="mt-4 flex flex-wrap gap-2">
             <Button disabled={building} onClick={confirm}>
-              {building ? "Preparando plan…" : "Confirmar y generar plan"}
+              {building ? "Preparando plan…" : planOptions.mode === "demo" ? "Confirmar y generar plan demo" : "Confirmar y generar plan"}
             </Button>
             <Button
               variant="outline"
@@ -393,7 +400,8 @@ function AgentConversation({
               <p className="mt-2">{s.reasons}</p>
               <p>Fecha límite: {s.deadline}</p>
               <p>{s.pending}</p>
-              <p className="mt-2">{s.requirements || "Requisitos no registrados."}</p>
+              <p className="mt-2">{s.requirements || (s.orientation.requirements.length ? "" : "Requisitos no registrados.")}</p>
+              <ul className="list-disc pl-5">{s.orientation.requirements.map((r, i) => <li key={i}>{r}</li>)}</ul>
               <p>{s.legacyDocuments || ""}</p>
               <ul>
                 {s.orientation.documents.map((d, i) => (
@@ -409,7 +417,7 @@ function AgentConversation({
                   rel="noopener noreferrer"
                   className="mt-2 inline-block break-all text-primary underline"
                 >
-                  Consultar fuente oficial ↗
+                  {s.orientation.illustrative ? "Consultar enlace de ejemplo ↗" : "Consultar fuente oficial ↗"}
                 </a>
               )}
             </article>

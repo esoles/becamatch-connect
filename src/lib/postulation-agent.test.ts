@@ -36,6 +36,28 @@ const scholarship: PlanScholarship = {
   official_url: null,
 };
 describe("conversational postulation plan", () => {
+  const pacifico: PlanScholarship = {
+    ...scholarship, id: "pacifico", name: "Beca Intercambio Pacífico", country: "Japón", study_level: "pregrado", area: "Todas", language_code: "Inglés", language_level: "B1", min_gpa: 15, deadline: "2027-01-10", es_demo: true, estado_datos: "propuesta_ficticia_no_verificada",
+    documentos_requeridos: [{ nombre: "Pasaporte", obligatorio: true }],
+  };
+  const exchangeProfile = { ...profile, desiredLevel: "pregrado", countries: ["Japón"], gpa: 16, languages: [{ code: "en", level: "B1" as const }] };
+  it("generates a confirmed named Pacifico demo using the exact deadline and deterministic 100 score", () => {
+    const result = makeAgentPlan(exchangeProfile, [pacifico], "2026-10-24", { mode: "demo", scholarshipName: pacifico.name });
+    expect(result.demo).toBe(true);
+    expect(result.opportunities[0]?.name).toBe("Beca Intercambio Pacífico");
+    expect(result.opportunities[0]?.deadline).toBe("2027-01-10");
+    expect(result.opportunities[0]?.score).toBe(100);
+    expect(result.opportunities[0]?.orientation.illustrative).toBe(true);
+  });
+  it("excludes real scholarships from demo plans", () => {
+    expect(makeAgentPlan(profile, [scholarship], "2026-10-24", { mode: "demo", scholarshipName: scholarship.name }).opportunities).toEqual([]);
+  });
+  it("requires the test verification flag and future deadline for demo plans", () => {
+    expect(makeAgentPlan(exchangeProfile, [{ ...pacifico, verified: false }, { ...pacifico, deadline: "2026-10-24" }], "2026-10-24", { mode: "demo", scholarshipName: pacifico.name }).opportunities).toEqual([]);
+  });
+  it("excludes Pacifico from default real plans", () => {
+    expect(makeAgentPlan(exchangeProfile, [pacifico], "2026-10-24").opportunities).toEqual([]);
+  });
   it("uses the existing 0–100 compatibility rules", () => {
     expect(makeAgentPlan(profile, [scholarship], "2026-10-18").opportunities[0]?.score).toBe(100);
   });

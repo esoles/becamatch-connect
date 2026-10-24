@@ -96,7 +96,7 @@ function PlanPage() {
                 ["Nivel académico", s.studyLevel],
                 ["Área de estudio", s.area],
                 ["Idioma", s.language],
-                ["Cobertura confirmada", s.coverage],
+                [s.orientation.illustrative ? "Cobertura de demostración" : "Cobertura confirmada", s.coverage],
                 ["Compatibilidad", s.score === null ? "Sin calcular" : `${s.score}/100`],
                 [
                   "Fecha límite",
@@ -166,7 +166,7 @@ function PlanPage() {
               <Button asChild className="mt-4">
                 <a href={s.url} target="_blank" rel="noopener noreferrer">
                   <ExternalLink />
-                  Ir a la convocatoria oficial
+                  {s.orientation.illustrative ? "Consultar enlace de ejemplo" : "Ir a la convocatoria oficial"}
                 </a>
               </Button>
             ) : (
