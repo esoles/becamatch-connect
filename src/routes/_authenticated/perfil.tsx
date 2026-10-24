@@ -189,6 +189,13 @@ function PerfilPage() {
         </div>
 
         <PrivacyConsent value={consent} onChange={setConsent} id="profile" />
+        <Button type="button" variant="outline" disabled={saving} onClick={async () => {
+          setSaving(true);
+          const { error } = await supabase.rpc("set_my_promotional_preferences", { email_promotions: consent.emailPromotions, whatsapp_promotions: consent.whatsappPromotions });
+          setSaving(false);
+          if (error) toast.error("No se pudieron guardar tus preferencias.");
+          else toast.success("Preferencias promocionales guardadas");
+        }}>Guardar solo preferencias promocionales</Button>
         <Button type="submit" className="h-11 w-full rounded-full" disabled={saving || !consent.legal}>
           {saving ? "Guardando…" : "Guardar y ver mis becas"}
         </Button>

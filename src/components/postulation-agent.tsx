@@ -74,7 +74,7 @@ function ConsentedAgent({ onBack, consent }: { onBack: () => void; consent: type
             conversationId: parsed.conversationId as string,
             resumeToken: parsed.resumeToken as string,
           };
-          const history = JSON.parse(await restore({ data: credential })) as {
+          const history = JSON.parse(await restore({ data: { ...credential, consent: consentPayload(consent) } })) as {
             messages: UIMessage[];
             plan: AgentPlan | null;
           };
