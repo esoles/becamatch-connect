@@ -13,6 +13,7 @@
 - Structured scholarship facts and provenance are normalized in src/lib/scholarship-orientation.ts and shared by detail, web assistant and WhatsApp; this keeps verification labels consistent without changing compatibility inputs.
 - The postulation agent resolves scholarship names deterministically through a public read-only catalog tool and the shared assistant facts block; informational lookup stays separate from verified-only plan generation to preserve provenance and profile confirmation.
 - The postulation agent uses AI SDK UI-message streaming and AI Elements with server-persisted append-only messages; anonymous resume credentials are hashed server-side, and optional authenticated identities are verified server-side. Confirmed plans use pure compatibility rules from a server-reloaded public catalog, separately from the legacy form. The central admin inbox relates records only by verified user IDs and never merges channel histories.
+- Streaming assistant responses receive unique message IDs before persistence because append-only transcript deduplication requires distinct IDs for each turn.
 - Parental status is set by a DB trigger from birth_date so users cannot self-approve.
 - Signed-in pages live under src/routes/_authenticated/ and read data via the browser client with RLS.
 - Admin panel lives under src/routes/admin/ (own ssr:false guard checking has_role admin); new signups get 'student' via auth.users trigger and admins are only created by an admin server function — public signup can never grant admin.
