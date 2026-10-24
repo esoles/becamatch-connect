@@ -1,8 +1,8 @@
 # Scholarship data expansion
 
 # Administrative metrics
-- [ ] Add real, deduplicated metrics with Lima date filters, existing follow-up stages and no fictional examples.
-- [ ] Verify calculations, admin access, unauthorized rejection and mobile display.
+- [x] Add database-backed, deduplicated metrics with Lima date filters and existing follow-up stages; exclude labeled fictional cases and admin accounts. Unmarked test data remains indistinguishable without a structured test flag.
+- [x] Verify 24 calculation/follow-up tests, real admin date filters and reload, student route and direct server rejection, anonymous redirect and mobile display. No payments or individual per-scholarship submission ledger exists; count first audited processes instead.
 
 # Submitted application test case
 - [x] Keep Ana test case Postulado, add María Ganado with explicit fictional objective and Luis Postulación en seguimiento; verified saved rows, priorities, next actions and newest-first ordering after reload; 16 tests passed.
