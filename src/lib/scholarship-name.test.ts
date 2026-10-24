@@ -20,6 +20,6 @@ describe("scholarship lookup by name", () => {
     expect(matchScholarshipNames(catalog, " ")).toEqual([]);
   });
   it("prefers an exact name over longer partial matches", () => {
-    expect(matchScholarshipNames([...catalog, { id: "3", name: "Programa Líderes Digitales Europa" }], catalog[0].name)).toEqual([catalog[0]]);
+    expect(matchScholarshipNames([...catalog, { id: "3", name: "Programa Líderes Digitales Europa" }], "Programa Líderes Digitales")).toEqual([catalog[0]]);
   });
 });

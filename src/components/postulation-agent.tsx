@@ -19,7 +19,7 @@ import {
   PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { Tool, ToolHeader, ToolContent, ToolInput } from "@/components/ai-elements/tool";
+import { Tool, ToolHeader, ToolContent, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning";
 import {
   AGENT_STORAGE_KEY,
@@ -276,6 +276,9 @@ function AgentConversation({
                         <ToolHeader type={part.type} state={part.state} title={part.type === "tool-lookup_scholarship" ? "Consultar beca" : "Preparar resumen"} />
                         <ToolContent>
                           <ToolInput input={part.input} />
+                          {part.type === "tool-lookup_scholarship" && part.state === "output-available" && (
+                            <ToolOutput output={part.output} errorText={undefined} />
+                          )}
                           {part.state === "output-error" && (
                             <p className="text-destructive">{part.errorText}</p>
                           )}
