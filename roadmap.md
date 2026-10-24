@@ -1,5 +1,9 @@
 # Scholarship data expansion
 
+# Administrative metrics
+- [ ] Add real, deduplicated metrics with Lima date filters, existing follow-up stages and no fictional examples.
+- [ ] Verify calculations, admin access, unauthorized rejection and mobile display.
+
 # Submitted application test case
 - [x] Keep Ana test case Postulado, add María Ganado with explicit fictional objective and Luis Postulación en seguimiento; verified saved rows, priorities, next actions and newest-first ordering after reload; 16 tests passed.
 - [x] Add Postulado to existing administrative stages and retain deterministic priority; 15 tests passed.

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import {
   LayoutDashboard,
+  ChartNoAxesCombined,
   BotMessageSquare,
   UsersRound,
   Inbox,
@@ -56,6 +57,7 @@ function AdminLayout() {
       label: "General",
       links: [
         { to: "/admin", label: "Resumen", icon: LayoutDashboard },
+        { to: "/admin/metricas", label: "Métricas", icon: ChartNoAxesCombined },
         { to: "/admin/asistente", label: "Asistente IA", icon: BotMessageSquare },
         { to: "/admin/postulantes", label: "Postulantes", icon: UsersRound },
         { to: "/admin/solicitudes", label: "Solicitudes", icon: Inbox },

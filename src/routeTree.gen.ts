@@ -22,6 +22,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAsistenteRouteImport } from './routes/admin/asistente'
 import { Route as AdminBecasRouteImport } from './routes/admin/becas'
 import { Route as AdminMarketingRouteImport } from './routes/admin/marketing'
+import { Route as AdminMetricasRouteImport } from './routes/admin/metricas'
 import { Route as AdminPostulantesRouteImport } from './routes/admin/postulantes'
 import { Route as AdminSolicitudesRouteImport } from './routes/admin/solicitudes'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
@@ -97,6 +98,11 @@ const AdminMarketingRoute = AdminMarketingRouteImport.update({
   path: '/marketing',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminMetricasRoute = AdminMetricasRouteImport.update({
+  id: '/metricas',
+  path: '/metricas',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminPostulantesRoute = AdminPostulantesRouteImport.update({
   id: '/postulantes',
   path: '/postulantes',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/admin/asistente': typeof AdminAsistenteRoute
   '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
+  '/admin/metricas': typeof AdminMetricasRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/admin/asistente': typeof AdminAsistenteRoute
   '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
+  '/admin/metricas': typeof AdminMetricasRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/admin/asistente': typeof AdminAsistenteRoute
   '/admin/becas': typeof AdminBecasRoute
   '/admin/marketing': typeof AdminMarketingRoute
+  '/admin/metricas': typeof AdminMetricasRoute
   '/admin/postulantes': typeof AdminPostulantesRoute
   '/admin/solicitudes': typeof AdminSolicitudesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/admin/asistente'
     | '/admin/becas'
     | '/admin/marketing'
+    | '/admin/metricas'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/admin/asistente'
     | '/admin/becas'
     | '/admin/marketing'
+    | '/admin/metricas'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/admin/asistente'
     | '/admin/becas'
     | '/admin/marketing'
+    | '/admin/metricas'
     | '/admin/postulantes'
     | '/admin/solicitudes'
     | '/admin/usuarios'
@@ -402,6 +414,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketingRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/metricas': {
+      id: '/admin/metricas'
+      path: '/metricas'
+      fullPath: '/admin/metricas'
+      preLoaderRoute: typeof AdminMetricasRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/postulantes': {
       id: '/admin/postulantes'
       path: '/postulantes'
@@ -498,6 +517,7 @@ interface AdminRouteRouteChildren {
   AdminAsistenteRoute: typeof AdminAsistenteRoute
   AdminBecasRoute: typeof AdminBecasRoute
   AdminMarketingRoute: typeof AdminMarketingRoute
+  AdminMetricasRoute: typeof AdminMetricasRoute
   AdminPostulantesRoute: typeof AdminPostulantesRoute
   AdminSolicitudesRoute: typeof AdminSolicitudesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
@@ -510,6 +530,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAsistenteRoute: AdminAsistenteRoute,
   AdminBecasRoute: AdminBecasRoute,
   AdminMarketingRoute: AdminMarketingRoute,
+  AdminMetricasRoute: AdminMetricasRoute,
   AdminPostulantesRoute: AdminPostulantesRoute,
   AdminSolicitudesRoute: AdminSolicitudesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
