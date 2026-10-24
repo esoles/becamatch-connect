@@ -3,6 +3,10 @@ import { stages, type Stage } from "./applicant-followup";
 export const METRICS_ZONE = "America/Lima";
 export const PRIORITY_THRESHOLD = 60;
 export type MetricsRange = { from: string; to: string };
+export type MetricsSource = "real" | "prueba";
+export function includesMetricIdentity(key: string, fictional: Set<string>, admins: Set<string>, source: MetricsSource) {
+  return !admins.has(key) && (source === "prueba" ? fictional.has(key) : !fictional.has(key));
+}
 export type MetricPerson = {
   key: string;
   createdAt: string;
