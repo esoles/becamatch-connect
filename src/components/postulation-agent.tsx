@@ -273,7 +273,7 @@ function AgentConversation({
                   if (isToolUIPart(part) && part.type !== "dynamic-tool")
                     return (
                       <Tool key={i} defaultOpen={false}>
-                        <ToolHeader type={part.type} state={part.state} title="Preparar resumen" />
+                        <ToolHeader type={part.type} state={part.state} title={part.type === "tool-lookup_scholarship" ? "Consultar beca" : "Preparar resumen"} />
                         <ToolContent>
                           <ToolInput input={part.input} />
                           {part.state === "output-error" && (
@@ -287,7 +287,7 @@ function AgentConversation({
               </MessageContent>
             </Message>
           ))}
-          {status === "submitted" && <Shimmer>Preparando la siguiente pregunta…</Shimmer>}
+          {status === "submitted" && <Shimmer>Preparando respuesta…</Shimmer>}
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>

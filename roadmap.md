@@ -1,5 +1,9 @@
 # Scholarship data expansion
 
+# Scholarship questions in the postulation agent
+- [ ] Add name-based catalog lookup and contextual answers with recorded dates, requirements and provenance; preserve profile confirmation and the existing form.
+- [ ] Test matching and real agent lookup, follow-up and history restoration.
+
 # Administrative metrics
 - [x] Add 21 labeled October test requests (three per stage) and a separate test metrics selector; verified current month, Today, reload and real-data isolation in admin. Test view currently shows 25 leads, 10 priority, 11 processes and 48% conversion including prior fictional cases; 26 tests passed.
 - [x] Add database-backed, deduplicated metrics with Lima date filters and existing follow-up stages; exclude labeled fictional cases and admin accounts. Unmarked test data remains indistinguishable without a structured test flag.
