@@ -10,6 +10,7 @@ const safeUrl = z
   .refine((s) => /^https?:\/\//.test(s))
   .nullable();
 export const sharedPlanSchema = z.object({
+  demo: z.boolean().optional(),
   notice: z.string(),
   steps: z.array(z.string()),
   opportunities: z.array(
@@ -30,6 +31,7 @@ export const sharedPlanSchema = z.object({
       pending: z.string(),
       language: nullableText,
       orientation: z.object({
+        illustrative: z.boolean().optional(),
         requirements: z.array(z.string()),
         documents: z.array(z.object({ nombre: z.string(), obligatorio: z.boolean() })),
         steps: z.array(z.string()),
@@ -47,6 +49,7 @@ const url = (value: string | null | undefined) =>
 // Explicit projection: never spread applicant profiles, conversation text or contact fields.
 export function shareablePlan(plan: AgentPlan): SharedPlan {
   return sharedPlanSchema.parse({
+    demo: plan.demo === true,
     notice: plan.notice,
     steps: plan.steps,
     opportunities: plan.opportunities.map((s) => ({
@@ -66,6 +69,7 @@ export function shareablePlan(plan: AgentPlan): SharedPlan {
       pending: s.pending,
       language: s.language ?? null,
       orientation: {
+        illustrative: s.orientation.illustrative,
         requirements: s.orientation.requirements,
         documents: s.orientation.documents,
         steps: s.orientation.steps,

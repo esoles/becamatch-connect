@@ -1,17 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { agentProfileSchema } from "./postulation-agent";
+import { agentProfileSchema, agentPlanOptionsSchema } from "./postulation-agent";
 import { readPlan } from "./postulation-agent.server";
 import { resumeSchema } from "./agent-history.functions";
 
 export const generateAgentPlan = createServerFn({ method: "POST" })
   .inputValidator((input) =>
-    resumeSchema.extend({ profile: agentProfileSchema, confirmed: z.literal(true) }).parse(input),
+    resumeSchema.extend({ profile: agentProfileSchema, confirmed: z.literal(true), options: agentPlanOptionsSchema.optional() }).parse(input),
   )
   .handler(async ({ data }) => {
     const { openConversation } = await import("./agent-history.server");
     const { db, conversation } = await openConversation(data);
-    const plan = await readPlan(data.profile);
+    const plan = await readPlan(data.profile, data.options);
     const { saveSharedPlan } = await import("./shared-plan.server");
     const saved = await saveSharedPlan(db, plan, {
       conversationId: data.conversationId,

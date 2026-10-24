@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { makeAgentPlan, type AgentProfile } from "./postulation-agent";
+import { makeAgentPlan, type AgentProfile, type AgentPlanOptions } from "./postulation-agent";
 import type { Database } from "@/integrations/supabase/types";
 import { matchScholarshipNames } from "./scholarship-name";
 import { scholarshipFactsBlock } from "./assistant.server";
@@ -46,16 +46,20 @@ export async function lookupScholarship(name: string) {
   };
 }
 
-export async function readPlan(profile: AgentProfile) {
+export async function readPlan(profile: AgentProfile, options: AgentPlanOptions = { mode: "real", scholarshipName: null }) {
   const client = publicCatalogClient();
-  const { data, error } = await client
+  let query = client
     .from("scholarships")
     .select("*")
     .eq("verified", true)
     .eq("archived", false)
-    .eq("es_demo", false)
-    .eq("estado_datos", "verificada")
+    .eq("es_demo", options.mode === "demo")
     .gt("deadline", new Date().toISOString().slice(0, 10));
+  if (options.mode === "real") query = query.eq("estado_datos", "verificada");
+  const { data, error } = await query;
   if (error) throw new Error("No se pudo consultar el catálogo de becas.");
-  return makeAgentPlan(profile, data ?? [], new Date().toISOString().slice(0, 10));
+  if (options.mode === "demo" && !options.scholarshipName) throw new Error("Elige la beca para tu plan de demostración.");
+  const catalog = options.scholarshipName ? matchScholarshipNames(data ?? [], options.scholarshipName) : data ?? [];
+  if (options.scholarshipName && catalog.length !== 1) throw new Error("Indica el nombre exacto de una beca habilitada y vigente.");
+  return makeAgentPlan(profile, catalog, new Date().toISOString().slice(0, 10), options);
 }

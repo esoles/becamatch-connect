@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { buildDeck, explain, type CompatProfile, type CompatScholarship } from "./compatibility";
 import { orientationData, type OrientationFields } from "./scholarship-orientation";
+import { LANGUAGES } from "./catalog";
 
 export const agentProfileSchema = z.object({
   name: z.string(),
@@ -42,7 +43,13 @@ export type PlanScholarship = CompatScholarship &
     official_url: string | null;
   };
 
-export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[], today: string) {
+export const agentPlanOptionsSchema = z.object({
+  mode: z.enum(["real", "demo"]),
+  scholarshipName: z.string().min(1).max(200).nullable(),
+});
+export type AgentPlanOptions = z.infer<typeof agentPlanOptionsSchema>;
+
+export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[], today: string, options: AgentPlanOptions = { mode: "real", scholarshipName: null }) {
   const validGpa =
     profile.gpa !== null &&
     profile.gpaScale !== null &&
@@ -56,8 +63,11 @@ export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[],
     languages: profile.languages,
     gpa: validGpa ? (Number(profile.gpa) / Number(profile.gpaScale)) * 20 : 0,
   };
-  const real = catalog.filter((s) => !s.es_demo && s.estado_datos === "verificada");
-  const deck = buildDeck(compatible, real, today);
+  const demo = options.mode === "demo";
+  const real = catalog.filter((s) => demo ? s.es_demo === true : !s.es_demo && s.estado_datos === "verificada");
+  // Normalize recorded language names at the catalog boundary, without changing scoring rules or stored facts.
+  const normalized = real.map((s) => ({ ...s, language_code: LANGUAGES.find((l) => l.name.toLowerCase() === s.language_code?.toLowerCase())?.code ?? s.language_code }));
+  const deck = buildDeck(compatible, normalized, today);
   const opportunities = validGpa
     ? deck.eligible
         .filter((r) => r.compatibility_score >= 50)
@@ -81,20 +91,23 @@ export function makeAgentPlan(profile: AgentProfile, catalog: PlanScholarship[],
           legacyDocuments: r.scholarship.documents,
           orientation: orientationData(r.scholarship),
           pending:
-            "Confirma nacionalidad, residencia, admisión y demás restricciones en la fuente oficial; el puntaje no confirma elegibilidad.",
+            demo ? "Datos de demostración: preparación simulada, sin envío de postulación. Requisitos y enlace de ejemplo, no oficiales." : "Confirma nacionalidad, residencia, admisión y demás restricciones en la fuente oficial; el puntaje no confirma elegibilidad.",
         }))
     : [];
   return {
+    demo,
     profile,
     opportunities,
     notice: !validGpa
       ? "Falta un promedio y una escala válidos para calcular la compatibilidad."
+      : demo
+        ? opportunities.length ? "Plan de demostración · Datos de demostración. Compatibilidad calculada; no representa una postulación real." : "No hay una beca de demostración habilitada, vigente y compatible con estos datos. Revisa el perfil y la beca elegida."
       : !real.length
         ? "Actualmente no hay becas reales con datos verificados disponibles. El catálogo contiene ejemplos ficticios; no se recomiendan como convocatorias reales."
         : !opportunities.length
           ? "No se encontraron becas verificadas con compatibilidad suficiente y fecha futura para estos datos."
           : "Compatibilidad calculada con las reglas de BecaMatch; la elegibilidad final debe confirmarse en la convocatoria.",
-    steps: [
+    steps: demo ? ["Revisa tu perfil de prueba y la compatibilidad calculada.", "Prepara los documentos ilustrativos indicados en esta beca.", "Revisa los pasos del intercambio como simulación; no se envía ninguna postulación."] : [
       "Completa o revisa tu perfil en BecaMatch.",
       "Consulta los requisitos y las fechas en cada fuente oficial.",
       "Prepara únicamente documentos confirmados y postula fuera de BecaMatch.",
