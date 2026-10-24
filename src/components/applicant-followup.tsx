@@ -210,39 +210,40 @@ export function ApplicantFollowupView({
           <option value="date">Fecha de seguimiento</option>
           <option value="pending">Antigüedad pendiente</option>
         </select>
-        <label className="grid gap-1 text-xs text-muted-foreground">
-          Fecha de postulación desde
-          <Input
-            aria-label="Fecha de postulación desde"
-            type="date"
-            max={to || undefined}
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
-        </label>
-        <label className="grid gap-1 text-xs text-muted-foreground">
-          Fecha de postulación hasta
-          <Input
-            aria-label="Fecha de postulación hasta"
-            type="date"
-            min={from || undefined}
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
-        </label>
-        {(from || to) && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="self-end"
-            onClick={() => {
-              setFrom("");
-              setTo("");
-            }}
-          >
-            Quitar rango de fechas
-          </Button>
-        )}
+        <div className="flex flex-wrap items-end gap-2 sm:col-span-2 xl:col-span-4">
+          <label className="grid min-w-[10rem] flex-1 gap-1 text-xs text-muted-foreground">
+            Fecha de postulación desde
+            <Input
+              aria-label="Fecha de postulación desde"
+              type="date"
+              max={to || undefined}
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
+          </label>
+          <label className="grid min-w-[10rem] flex-1 gap-1 text-xs text-muted-foreground">
+            Fecha de postulación hasta
+            <Input
+              aria-label="Fecha de postulación hasta"
+              type="date"
+              min={from || undefined}
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
+          </label>
+          {(from || to) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setFrom("");
+                setTo("");
+              }}
+            >
+              Quitar rango de fechas
+            </Button>
+          )}
+        </div>
       </div>
       <div className="overflow-x-auto border-y border-border">
         <table className="w-full min-w-[1120px] text-left text-sm">
