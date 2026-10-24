@@ -1,7 +1,7 @@
 # Scholarship data expansion
 
 # Administrative metrics
-- [ ] Add labeled current-month test records and a separate test metrics selector; verify dates, totals and real-data isolation.
+- [x] Add 21 labeled October test requests (three per stage) and a separate test metrics selector; verified current month, Today, reload and real-data isolation in admin. Test view currently shows 25 leads, 10 priority, 11 processes and 48% conversion including prior fictional cases; 26 tests passed.
 - [x] Add database-backed, deduplicated metrics with Lima date filters and existing follow-up stages; exclude labeled fictional cases and admin accounts. Unmarked test data remains indistinguishable without a structured test flag.
 - [x] Verify 24 calculation/follow-up tests, real admin date filters and reload, student route and direct server rejection, anonymous redirect and mobile display. No payments or individual per-scholarship submission ledger exists; count first audited processes instead.
 
