@@ -113,6 +113,27 @@
       "when": 1792341174357,
       "tag": "0015_allow_submitted_applicant_stage",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792878782275,
+      "tag": "0016_informed_privacy_consent",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792878905322,
+      "tag": "0017_privacy_conversation_renewal_and_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792879026649,
+      "tag": "0018_lock_consent_evidence_privileges",
+      "breakpoints": true
     }
   ]
 }

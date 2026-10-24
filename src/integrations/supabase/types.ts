@@ -210,6 +210,10 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          privacy_accepted: boolean
+          privacy_version: string | null
+          promotions_email: boolean
+          promotions_whatsapp: boolean
           recommended_scholarship_ids: string[]
           request_text: string
           status: string
@@ -223,6 +227,10 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          privacy_accepted?: boolean
+          privacy_version?: string | null
+          promotions_email?: boolean
+          promotions_whatsapp?: boolean
           recommended_scholarship_ids?: string[]
           request_text: string
           status?: string
@@ -236,10 +244,47 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          privacy_accepted?: boolean
+          privacy_version?: string | null
+          promotions_email?: boolean
+          promotions_whatsapp?: boolean
           recommended_scholarship_ids?: string[]
           request_text?: string
           status?: string
           updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      privacy_consents: {
+        Row: {
+          granted: boolean
+          id: string
+          policy_version: string
+          purpose: string
+          recorded_at: string
+          source: string
+          source_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          granted: boolean
+          id?: string
+          policy_version: string
+          purpose: string
+          recorded_at?: string
+          source: string
+          source_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          granted?: boolean
+          id?: string
+          policy_version?: string
+          purpose?: string
+          recorded_at?: string
+          source?: string
+          source_id?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -439,6 +484,10 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          privacy_accepted: boolean
+          privacy_version: string | null
+          promotions_email: boolean
+          promotions_whatsapp: boolean
           resume_token_hash: string
           status: string
           updated_at: string
@@ -447,6 +496,10 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          privacy_accepted?: boolean
+          privacy_version?: string | null
+          promotions_email?: boolean
+          promotions_whatsapp?: boolean
           resume_token_hash: string
           status?: string
           updated_at?: string
@@ -455,6 +508,10 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          privacy_accepted?: boolean
+          privacy_version?: string | null
+          promotions_email?: boolean
+          promotions_whatsapp?: boolean
           resume_token_hash?: string
           status?: string
           updated_at?: string
@@ -664,6 +721,20 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      record_my_privacy_consent: {
+        Args: {
+          email_promotions?: boolean
+          legal: boolean
+          origin?: string
+          policy: string
+          whatsapp_promotions?: boolean
+        }
+        Returns: undefined
+      }
+      set_my_promotional_preferences: {
+        Args: { email_promotions: boolean; whatsapp_promotions: boolean }
+        Returns: undefined
       }
     }
     Enums: {

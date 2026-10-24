@@ -30,6 +30,8 @@ import {
 } from "@/lib/postulation-agent";
 import { generateAgentPlan, emailAgentPlan } from "@/lib/postulation-agent.functions";
 import { startAgentConversation, restoreAgentConversation } from "@/lib/agent-history.functions";
+import { PrivacyConsent } from "@/components/privacy-consent";
+import { consentPayload, emptyConsent } from "@/lib/privacy";
 import { supabase } from "@/integrations/supabase/client";
 
 type SavedConversation = {
@@ -50,6 +52,13 @@ const initialMessage: UIMessage = {
 };
 
 export function PostulationAgent({ onBack }: { onBack: () => void }) {
+  const [consent, setConsent] = useState({ ...emptyConsent });
+  const [ready, setReady] = useState(false);
+  if (!ready) return <main className="mx-auto max-w-lg space-y-5 px-4 py-8"><Button variant="ghost" onClick={onBack}><ArrowLeft />Opciones</Button><h1 className="text-2xl font-semibold">Privacidad de la conversación</h1><PrivacyConsent value={consent} onChange={setConsent} id="agent" purpose="guardar y atender mi conversación, procesar mis respuestas con IA y preparar un plan; el correo se envía solo si lo solicito" /><Button disabled={!consent.legal} onClick={() => setReady(true)}>Continuar al agente</Button></main>;
+  return <ConsentedAgent onBack={onBack} consent={consent} />;
+}
+
+function ConsentedAgent({ onBack, consent }: { onBack: () => void; consent: typeof emptyConsent }) {
   const [saved, setSaved] = useState<SavedConversation | null>(null);
   const [failure, setFailure] = useState("");
   const start = useServerFn(startAgentConversation);
@@ -65,7 +74,7 @@ export function PostulationAgent({ onBack }: { onBack: () => void }) {
             conversationId: parsed.conversationId as string,
             resumeToken: parsed.resumeToken as string,
           };
-          const history = JSON.parse(await restore({ data: credential })) as {
+          const history = JSON.parse(await restore({ data: { ...credential, consent: consentPayload(consent) } })) as {
             messages: UIMessage[];
             plan: AgentPlan | null;
           };
@@ -76,7 +85,7 @@ export function PostulationAgent({ onBack }: { onBack: () => void }) {
           };
         }
         const { data: session } = await supabase.auth.getSession();
-        const credential = await start({ data: { accessToken: session.session?.access_token } });
+        const credential = await start({ data: { accessToken: session.session?.access_token, consent: consentPayload(consent) } });
         localStorage.setItem(AGENT_STORAGE_KEY, JSON.stringify(credential));
         return { ...credential, messages: [initialMessage], plan: null };
       })();
@@ -87,7 +96,7 @@ export function PostulationAgent({ onBack }: { onBack: () => void }) {
           error instanceof Error ? error.message : "No se pudo recuperar la conversación.",
         ),
       );
-  }, [start, restore]);
+  }, [start, restore, consent]);
   return saved ? (
     <AgentConversation
       key={saved.conversationId}

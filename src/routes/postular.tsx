@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { PostulationAgent } from "@/components/postulation-agent";
 import { ClipboardList, MessagesSquare, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { PrivacyConsent } from "@/components/privacy-consent";
+import { consentPayload, emptyConsent } from "@/lib/privacy";
 
 export const Route = createFileRoute("/postular")({
   head: () => ({
@@ -78,6 +80,7 @@ function PostularPage() {
 function PostulationForm() {
   const submit = useServerFn(submitPostulation);
   const [fullName, setFullName] = useState("");
+  const [consent, setConsent] = useState({ ...emptyConsent });
   const [email, setEmail] = useState("");
   const [requestText, setRequestText] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -91,12 +94,13 @@ function PostulationForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!consent.legal) { setErrorMsg("Autoriza el tratamiento de tus datos."); setState("error"); return; }
     setState("sending");
     setErrorMsg("");
     try {
       const { data: session } = await supabase.auth.getSession();
       const res = await submit({
-        data: { fullName, email, requestText, accessToken: session.session?.access_token },
+        data: { fullName, email, requestText, consent: consentPayload(consent), accessToken: session.session?.access_token },
       });
       if (res.ok) {
         setResult(res);
@@ -201,8 +205,9 @@ function PostulationForm() {
             Incluye tu nivel de estudios, área, promedio, países de interés e idiomas.
           </p>
         </div>
+        <PrivacyConsent value={consent} onChange={setConsent} id="contact" purpose="atender mi solicitud, analizar mis datos con IA, preparar mi plan y enviarlo al correo indicado" />
         {state === "error" && <p className="text-sm text-destructive">{errorMsg}</p>}
-        <Button type="submit" className="w-full" disabled={state === "sending"}>
+        <Button type="submit" className="w-full" disabled={state === "sending" || !consent.legal}>
           {state === "sending" ? "Enviando…" : "Recibir mi plan de postulación"}
         </Button>
       </form>

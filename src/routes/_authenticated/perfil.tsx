@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { AREAS, COUNTRIES, LANGUAGES, STUDY_LEVELS } from "@/lib/catalog";
 import { CEFR, isMinor, type Cefr, type UserLanguage } from "@/lib/compatibility";
 import { PARENTAL_LABEL, profileQuery } from "@/lib/profile";
+import { PrivacyConsent } from "@/components/privacy-consent";
+import { consentPayload, emptyConsent, PRIVACY_VERSION } from "@/lib/privacy";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -50,6 +52,25 @@ function PerfilPage() {
     gpa: "", graduation_year: "",
   });
   const [saving, setSaving] = useState(false);
+  const [consent, setConsent] = useState({ ...emptyConsent });
+
+  useEffect(() => {
+    void (async () => {
+      const pending = sessionStorage.getItem("signup_privacy");
+      if (pending) {
+        try {
+          const parsed = consentPayload(JSON.parse(pending));
+          const { error } = await supabase.rpc("record_my_privacy_consent", { policy: parsed.policyVersion, legal: true, email_promotions: parsed.emailPromotions, whatsapp_promotions: parsed.whatsappPromotions, origin: "registro" });
+          if (error) throw error;
+          sessionStorage.removeItem("signup_privacy");
+        } catch { toast.error("Confirma tu consentimiento en este perfil."); }
+      }
+      const { data, error } = await supabase.from("privacy_consents").select("purpose,granted,policy_version").order("recorded_at", { ascending: false }).order("id", { ascending: false });
+      if (error) { toast.error("No se pudieron consultar tus consentimientos."); return; }
+      const latest = (purpose: string) => data?.find((row) => row.purpose === purpose);
+      setConsent({ legal: latest("servicio")?.granted === true && latest("servicio")?.policy_version === PRIVACY_VERSION, emailPromotions: latest("promociones_email")?.granted === true, whatsappPromotions: latest("promociones_whatsapp")?.granted === true });
+    })();
+  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
@@ -68,6 +89,7 @@ function PerfilPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (!consent.legal) { toast.error("Autoriza el tratamiento de tus datos antes de guardar."); return; }
     const parsed = schema.safeParse({
       ...f,
       gpa: f.gpa === "" ? NaN : Number(f.gpa),
@@ -77,7 +99,11 @@ function PerfilPage() {
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setSaving(true);
     const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("profiles").upsert({ id: u.user!.id, email, ...parsed.data });
+    if (!u.user) { setSaving(false); toast.error("Sesión expirada."); return; }
+    const accepted = consentPayload(consent);
+    const recorded = await supabase.rpc("record_my_privacy_consent", { policy: accepted.policyVersion, legal: true, email_promotions: accepted.emailPromotions, whatsapp_promotions: accepted.whatsappPromotions, origin: "perfil" });
+    if (recorded.error) { setSaving(false); toast.error("No se pudo registrar el consentimiento; no se guardó el perfil."); return; }
+    const { error } = await supabase.from("profiles").upsert({ id: u.user.id, email: u.user.email ?? email, ...parsed.data });
     setSaving(false);
     if (error) { toast.error("No se pudo guardar el perfil."); return; }
     await qc.invalidateQueries({ queryKey: ["profile"] });
@@ -162,7 +188,15 @@ function PerfilPage() {
           </div>
         </div>
 
-        <Button type="submit" className="h-11 w-full rounded-full" disabled={saving}>
+        <PrivacyConsent value={consent} onChange={setConsent} id="profile" />
+        <Button type="button" variant="outline" disabled={saving} onClick={async () => {
+          setSaving(true);
+          const { error } = await supabase.rpc("set_my_promotional_preferences", { email_promotions: consent.emailPromotions, whatsapp_promotions: consent.whatsappPromotions });
+          setSaving(false);
+          if (error) toast.error("No se pudieron guardar tus preferencias.");
+          else toast.success("Preferencias promocionales guardadas");
+        }}>Guardar solo preferencias promocionales</Button>
+        <Button type="submit" className="h-11 w-full rounded-full" disabled={saving || !consent.legal}>
           {saving ? "Guardando…" : "Guardar y ver mis becas"}
         </Button>
       </form>
